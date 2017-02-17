@@ -5,7 +5,7 @@ public class MapRenderer : MonoBehaviour {
 
     [SerializeField] private Renderer Renderer;
 
-    public void RenderMap(int[,] map) {
+    public void RenderHeightMap(float[,] map) {
         int width = map.GetLength(0);
         int height = map.GetLength(1);
 
