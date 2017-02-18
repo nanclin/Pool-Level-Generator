@@ -3,6 +3,13 @@ using UnityEngine;
 
 public class MapGenerator : MonoBehaviour {
 
+    private Vector2[] FourWayOffsets = new Vector2[4] {
+        new Vector2(0, 1),
+        new Vector2(1, 0),
+        new Vector2(0, -1),
+        new Vector2(-1, 0)
+    };
+
     [SerializeField] private MapRenderer InputMapRenderer;
     [SerializeField] private MapRenderer DebugMapRenderer;
     [SerializeField] private Texture2D InputImage;
@@ -14,6 +21,7 @@ public class MapGenerator : MonoBehaviour {
 
     private List<Vector2> Contour;
     private Color[,] DebugMap;
+    int floodFillIterationLimit;
 
     public int[,] GenerateMap() {
         int[,] map = new int[Width, Height];
@@ -118,11 +126,58 @@ public class MapGenerator : MonoBehaviour {
         return Vector2.zero;
     }
 
+    private void FloodFill(int[,] map, Vector2 node, int target, int replacement, bool logs = false) {
+        int x = (int) node.x;
+        int y = (int) node.y;
+    
+        if (logs) Debug.Log(string.Format("visited x={0} y={1}", x, y));
+    
+        if (x < 0 || x >= Width || y < 0 || y >= Height) {
+            if (logs) Debug.Log("Index out of range");
+            return;
+        }
+    
+        // mark visited
+        //        DebugMap[x, y] = Color.magenta;
+    
+        if (--floodFillIterationLimit <= 0) {
+            if (logs) Debug.Log("Too many iterations!");
+            return;
+        }
+    
+        if (target == replacement) {
+            if (logs) Debug.Log("target == replacement!");
+            return;
+        }
+        if (map[x, y] != target) {
+            if (logs) Debug.Log("map[x, y] != target");
+            return;
+        }
+
+        if (logs) Debug.Log("Replaced");
+        map[x, y] = replacement;
+        DebugMap[x, y] = Color.red;
+    
+        if (logs) Debug.Log("Going up!");
+        FloodFill(map, node + FourWayOffsets[0], target, replacement);
+        if (logs) Debug.Log("Going right!");
+        FloodFill(map, node + FourWayOffsets[1], target, replacement);
+        if (logs) Debug.Log("Going down!");
+        FloodFill(map, node + FourWayOffsets[2], target, replacement);
+        if (logs) Debug.Log("Going left!");
+        FloodFill(map, node + FourWayOffsets[3], target, replacement);
+        return;
+    }
+
     public void RenderMap() {
         int[,] map = GenerateMap();
         InputMapRenderer.RenderBitMap(map);
 
         Contour = GetContour(map);
+
+        floodFillIterationLimit = 30000;
+        FloodFill(map, Contour[0], 1, 0);
+
         DebugMapRenderer.RenderColourMap(DebugMap);
     }
 
