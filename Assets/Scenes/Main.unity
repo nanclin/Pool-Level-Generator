@@ -148,9 +148,9 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 619788653}
-  m_LocalRotation: {x: 0, y: -1, z: 0, w: -0.00000016292068}
+  m_LocalRotation: {x: -0.000000115202326, y: 0.7071067, z: -0.7071068, w: -0.00000011520231}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 100, y: 1, z: 100}
+  m_LocalScale: {x: 10, y: 0.1, z: 10}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
@@ -173,11 +173,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MapRenderer: {fileID: 619788655}
-  InputTexture: {fileID: 2800000, guid: ac374f8b1cb6d49178f672c834de3a59, type: 3}
+  ContourMapRenderer: {fileID: 0}
+  InputTexture: {fileID: 2800000, guid: 53cfc343996e943d3bcf88035600aa19, type: 3}
   Width: 100
   Height: 100
-  Treshold: 0.31
-  AutoUpdate: 1
+  Treshold: 0.67
+  AutoUpdate: 0
 --- !u!1 &934295613
 GameObject:
   m_ObjectHideFlags: 0
