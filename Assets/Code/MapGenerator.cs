@@ -18,6 +18,10 @@ public class MapGenerator : MonoBehaviour {
 
         for (int y = 0; y < Height; y++) {
             for (int x = 0; x < Width; x++) {
+                if (x == 0 || x == Width - 1 || y == 0 || y == Height - 1) {
+                    map[x, y] = 0;
+                    continue;
+                }
                 map[x, y] = InputTexture.GetPixel(x, y).grayscale > Treshold ? 1 : 0;
             }
         }
