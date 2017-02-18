@@ -3,18 +3,21 @@ using UnityEngine;
 
 public class MapGenerator : MonoBehaviour {
 
-    [SerializeField] private MapRenderer MapRenderer;
-    [SerializeField] private MapRenderer ContourMapRenderer;
-    [SerializeField] private Texture2D InputTexture;
+    [SerializeField] private MapRenderer InputMapRenderer;
+    [SerializeField] private MapRenderer DebugMapRenderer;
+    [SerializeField] private Texture2D InputImage;
     [SerializeField] private int Width;
     [SerializeField] private  int Height;
     [Range(0, 1)] [SerializeField] private float Treshold;
     [SerializeField] public bool AutoUpdate;
+    [SerializeField] public bool DrawGizmoLine;
 
     private List<Vector2> Contour;
+    private Color[,] DebugMap;
 
     public int[,] GenerateMap() {
         int[,] map = new int[Width, Height];
+        DebugMap = new Color[Width, Height];
 
         for (int y = 0; y < Height; y++) {
             for (int x = 0; x < Width; x++) {
@@ -22,13 +25,16 @@ public class MapGenerator : MonoBehaviour {
                     map[x, y] = 0;
                     continue;
                 }
-                map[x, y] = InputTexture.GetPixel(x, y).grayscale > Treshold ? 1 : 0;
+                map[x, y] = InputImage.GetPixel(x, y).grayscale > Treshold ? 1 : 0;
+                DebugMap[x, y] = Color.clear;
             }
         }
         return map;
     }
 
-    public List<Vector2> GetContour(int[,] inputMap) {
+    public List<Vector2> GetContour(int[,]  inputMap, bool logs = false) {
+        if (logs) Debug.Log("-----GET CONTOUR-----");
+
         List<Vector2> contour = new List<Vector2>();
 
         Vector2 startPos = new Vector2(0, -1);
@@ -42,9 +48,10 @@ public class MapGenerator : MonoBehaviour {
                 currentPos = new Vector2(x, y);
                 currentPosValue = inputMap[x, y];
                 directionIndex = GetDirectionIndex(currentPos, previousPos);
+                DebugMap[x, y] = Color.cyan;
                 if (currentPosValue == 1) {
                     startPos = currentPos;
-                    Debug.Log(string.Format("startPos={0}", startPos));
+                    if (logs) Debug.Log(string.Format("startPos={0}", startPos));
                     break;
                 }
                 previousPos = currentPos;
@@ -61,21 +68,24 @@ public class MapGenerator : MonoBehaviour {
             previousPos = currentPos;
 
             if (currentPosValue == 1) {// go left
-                if (!contour.Contains(currentPos)) {
+                bool isVisited = contour.Contains(currentPos);
+                if (!isVisited) {
+                    DebugMap[(int) currentPos.x, (int) currentPos.y] = Color.blue;
                     contour.Add(currentPos);
-                    Debug.Log(string.Format("added to contour: currentPos={0}", currentPos));
+                    if (logs) Debug.Log(string.Format("added to contour: currentPos={0}", currentPos));
                 }
                 currentPos += GetLeftOffset(directionIndex);
-                Debug.Log(string.Format("going left, new pos={0}", currentPos));
+                if (logs) Debug.Log(string.Format("going left, new pos={0}", currentPos));
             } else {// go right
                 currentPos += GetRightOffset(directionIndex);
-                Debug.Log(string.Format("going right, new pos={0}", currentPos));
+                if (logs) Debug.Log(string.Format("going right, new pos={0}", currentPos));
             }
             int x = (int) currentPos.x;
             int y = (int) currentPos.y;
             currentPosValue = inputMap[x, y];
 
             IsReachedStart = currentPos == startPos;
+            if (IsReachedStart) if (logs) Debug.Log("Contour found!");
 
             if (--iterationLimit <= 0) break;
         }
@@ -110,11 +120,14 @@ public class MapGenerator : MonoBehaviour {
 
     public void RenderMap() {
         int[,] map = GenerateMap();
-        MapRenderer.RenderBitMap(map);
+        InputMapRenderer.RenderBitMap(map);
+
         Contour = GetContour(map);
+        DebugMapRenderer.RenderColourMap(DebugMap);
     }
 
     void OnDrawGizmos() {
+        if (!DrawGizmoLine) return;
         if (Contour == null) return;
         Vector2 previousPoint = Contour[0];
         float scale = 0.01f;
