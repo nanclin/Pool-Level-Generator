@@ -52,6 +52,28 @@ public class MapGenerator : MonoBehaviour {
         return map;
     }
 
+    public List<Vector2> GetEdgePixels(int[,] map, bool logs = false) {
+        
+        List<Vector2> edge = new List<Vector2>();
+
+        for (int x = 0; x < Width; x++) {
+            for (int y = 0; y < Height; y++) {
+
+                DebugMap[x, y] = Color.cyan;//mark visited
+
+                if (map[x, y] != 1) continue;//not fill value
+
+                int neigbhours = CountFillNeighbours(map, new Vector2(x, y));
+
+                if (neigbhours < 8 && neigbhours > 0) {//not completely empty and not completely full
+                    DebugMap[x, y] = Color.red;
+                }
+            }
+        }
+
+        return edge;
+    }
+
     public List<Vector2> GetContour(int[,] inputMap, bool logs = false) {
         if (logs) Debug.Log("-----GET CONTOUR-----");
 
@@ -79,7 +101,7 @@ public class MapGenerator : MonoBehaviour {
             if (currentPosValue == 1) break;
         }
 
-        int iterationLimit = 1000;
+        int iterationLimit = 10000;
         bool IsReachedStart = false;
 
         while (!IsReachedStart) {
@@ -204,6 +226,9 @@ public class MapGenerator : MonoBehaviour {
             Vector2 newPos = position + EightWayOffsets[i];
             int x = (int) newPos.x;
             int y = (int) newPos.y;
+
+            if (x < 0 || x >= Width || y < 0 || y >= Height) continue;
+
             bool isFull = map[x, y] == 1;
             if (isFull) count++;
         }
@@ -214,22 +239,8 @@ public class MapGenerator : MonoBehaviour {
         int[,] map = GenerateMap();
         InputMapRenderer.RenderBitMap(map);
 
-        Contour = GetContour(map);
-
-        Vector2 floodFillSourcePos = Contour[0];
-        for (int i = 0; i < EightWayOffsets.Length; i++) {
-            Vector2 newPos = floodFillSourcePos + EightWayOffsets[i];
-            int x = (int) newPos.x;
-            int y = (int) newPos.y;
-            if (DebugMap[x, y].a == 0) {
-                floodFillSourcePos = newPos;
-                break;
-            }
-        }
-
-//        Vector2 floodFillSourcePos = new Vector2(5, 5);
-        floodFillIterationLimit = 30000;
-        FloodFill(map, floodFillSourcePos, 1, 0);
+//        Contour = GetContour(map);
+        List<Vector2> edgePixels = GetEdgePixels(map);
 
         DebugMapRenderer.RenderColourMap(DebugMap);
     }
