@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+[ExecuteInEditMode]
 public class MapGenerator : MonoBehaviour {
 
     private Vector2[] FourWayOffsets = new Vector2[4] {
@@ -8,6 +9,17 @@ public class MapGenerator : MonoBehaviour {
         new Vector2(1, 0),
         new Vector2(0, -1),
         new Vector2(-1, 0)
+    };
+
+    private Vector2[] EightWayOffsets = new Vector2[8] {
+        new Vector2(0, 1),
+        new Vector2(1, 1),
+        new Vector2(1, 0),
+        new Vector2(1, -1),
+        new Vector2(0, -1),
+        new Vector2(-1, -1),
+        new Vector2(-1, 0),
+        new Vector2(-1, 1)
     };
 
     [SerializeField] private MapRenderer InputMapRenderer;
@@ -40,7 +52,7 @@ public class MapGenerator : MonoBehaviour {
         return map;
     }
 
-    public List<Vector2> GetContour(int[,]  inputMap, bool logs = false) {
+    public List<Vector2> GetContour(int[,] inputMap, bool logs = false) {
         if (logs) Debug.Log("-----GET CONTOUR-----");
 
         List<Vector2> contour = new List<Vector2>();
@@ -127,6 +139,12 @@ public class MapGenerator : MonoBehaviour {
     }
 
     private void FloodFill(int[,] map, Vector2 node, int target, int replacement, bool logs = false) {
+
+        if (target == replacement) {
+            if (logs) Debug.Log("Region already has given value!");
+            return;
+        }
+
         int x = (int) node.x;
         int y = (int) node.y;
     
@@ -145,19 +163,30 @@ public class MapGenerator : MonoBehaviour {
             return;
         }
     
-        if (target == replacement) {
-            if (logs) Debug.Log("target == replacement!");
+        if (map[x, y] == replacement) {
+            if (logs) Debug.Log("Already has wanted value!");
             return;
         }
+
+        if (DebugMap[x, y].a > 0) {
+            if (logs) Debug.Log("Already visited!");
+            return;
+        }
+
         if (map[x, y] != target) {
-            if (logs) Debug.Log("map[x, y] != target");
+            if (logs) Debug.Log("Pixel from another region!");
+            return;
+        }
+
+        if (CountFillNeighbours(map, node) < 8) {
+            if (logs) Debug.Log("Near the edge!");
             return;
         }
 
         if (logs) Debug.Log("Replaced");
-        map[x, y] = replacement;
-        DebugMap[x, y] = Color.red;
-    
+        //        map[x, y] = replacement;
+        DebugMap[x, y] = Color.cyan;
+
         if (logs) Debug.Log("Going up!");
         FloodFill(map, node + FourWayOffsets[0], target, replacement);
         if (logs) Debug.Log("Going right!");
@@ -169,14 +198,38 @@ public class MapGenerator : MonoBehaviour {
         return;
     }
 
+    private int CountFillNeighbours(int[,] map, Vector2 position) {
+        int count = 0;
+        for (int i = 0; i < EightWayOffsets.Length; i++) {
+            Vector2 newPos = position + EightWayOffsets[i];
+            int x = (int) newPos.x;
+            int y = (int) newPos.y;
+            bool isFull = map[x, y] == 1;
+            if (isFull) count++;
+        }
+        return count;
+    }
+
     public void RenderMap() {
         int[,] map = GenerateMap();
         InputMapRenderer.RenderBitMap(map);
 
         Contour = GetContour(map);
 
+        Vector2 floodFillSourcePos = Contour[0];
+        for (int i = 0; i < EightWayOffsets.Length; i++) {
+            Vector2 newPos = floodFillSourcePos + EightWayOffsets[i];
+            int x = (int) newPos.x;
+            int y = (int) newPos.y;
+            if (DebugMap[x, y].a == 0) {
+                floodFillSourcePos = newPos;
+                break;
+            }
+        }
+
+//        Vector2 floodFillSourcePos = new Vector2(5, 5);
         floodFillIterationLimit = 30000;
-        FloodFill(map, Contour[0], 1, 0);
+        FloodFill(map, floodFillSourcePos, 1, 0);
 
         DebugMapRenderer.RenderColourMap(DebugMap);
     }
