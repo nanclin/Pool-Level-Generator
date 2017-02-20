@@ -155,7 +155,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 169744216}
   m_LocalRotation: {x: -0.000000115202326, y: -0.7071067, z: 0.7071068, w: -0.00000011520231}
-  m_LocalPosition: {x: 100, y: 0, z: -0.9}
+  m_LocalPosition: {x: 100, y: 0, z: 0}
   m_LocalScale: {x: 10, y: 0.1, z: 10}
   m_Children: []
   m_Father: {fileID: 619788656}
@@ -206,9 +206,10 @@ MonoBehaviour:
   InputImage: {fileID: 2800000, guid: b785a2ac10d05417a9177b9f4baceb57, type: 3}
   Width: 100
   Height: 100
-  Treshold: 0.66
-  AutoUpdate: 1
-  DrawGizmoLine: 0
+  Treshold: 0.47
+  AutoUpdateGizmos: 1
+  DrawGizmoLine: 1
+  OutlineDetail: 1
 --- !u!1 &934295613
 GameObject:
   m_ObjectHideFlags: 0
