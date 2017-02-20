@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class Cell {
 
-    private int Width = 100;
-    private int Height = 100;
+    private int Width = 128;
+    private int Height = 128;
 
     public int X;
     public int Y;
@@ -286,7 +286,7 @@ public class MapGenerator : MonoBehaviour {
             }
         }
 
-        QuadTree = new QuadTree(allOutlineCells, 0, 0, 100, 100);
+        QuadTree = new QuadTree(allOutlineCells, 0, 0, Width, Height);
 //        QuadTree = new QuadTree(
 //            new List<Cell> {
 //                new Cell(30, 30, 0),
@@ -325,7 +325,7 @@ public class MapGenerator : MonoBehaviour {
         DrawOutlinesGizmos(Outlines);
 
         if (QuadTree != null) {
-            QuadTree.DrawQuadTreeGizmos(100, 100);
+            QuadTree.DrawQuadTreeGizmos(Width, Height);
         }
     }
 }
