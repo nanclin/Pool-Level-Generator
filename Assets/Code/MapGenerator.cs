@@ -29,14 +29,112 @@ public class Cell {
     }
 }
 
+public class QuadTree {
+
+    public float X;
+    public float Y;
+    public float Width;
+    public float Height;
+
+    public List<Cell> Cells;
+
+    public QuadTree QuadTree1;
+    public QuadTree QuadTree2;
+    public QuadTree QuadTree3;
+    public QuadTree QuadTree4;
+
+    public  QuadTree(List<Cell> cells, float x, float y, float width, float height, int maxCellPerQuad = 1) {
+
+        X = x;
+        Y = y;
+        Width = width;
+        Height = height;
+
+        if (cells.Count > maxCellPerQuad) {
+
+            List<Cell> quadrant1Cells = new List<Cell>();
+            List<Cell> quadrant2Cells = new List<Cell>();
+            List<Cell> quadrant3Cells = new List<Cell>();
+            List<Cell> quadrant4Cells = new List<Cell>();
+
+            float widthHalf = width * 0.5f;
+            float heightHalf = height * 0.5f;
+            float x1 = x;
+            float y1 = y;
+            float x2 = x + widthHalf;
+            float y2 = y;
+            float x3 = x;
+            float y3 = y + heightHalf;
+            float x4 = x + widthHalf;
+            float y4 = y + heightHalf;
+
+            for (int i = 0; i < cells.Count; i++) {
+                Cell cell = cells[i];
+            
+                if (cell.X >= x1 && cell.X < x1 + widthHalf && cell.Y >= y1 && cell.Y < y1 + heightHalf) {
+                    quadrant1Cells.Add(cell);
+                } else if (cell.X >= x2 && cell.X < x2 + widthHalf && cell.Y >= y1 && cell.Y < y1 + heightHalf) {
+                    quadrant2Cells.Add(cell);
+                } else if (cell.X >= x3 && cell.X < x3 + widthHalf && cell.Y >= y3 && cell.Y < y3 + heightHalf) {
+                    quadrant3Cells.Add(cell);
+                } else if (cell.X >= x4 && cell.X < x4 + widthHalf && cell.Y >= y4 && cell.Y < y4 + heightHalf) {
+                    quadrant4Cells.Add(cell);
+                }
+            }
+            QuadTree1 = new QuadTree(quadrant1Cells, x1, y1, widthHalf, heightHalf, maxCellPerQuad);
+            QuadTree2 = new QuadTree(quadrant2Cells, x2, y2, widthHalf, heightHalf, maxCellPerQuad);
+            QuadTree3 = new QuadTree(quadrant3Cells, x3, y3, widthHalf, heightHalf, maxCellPerQuad);
+            QuadTree4 = new QuadTree(quadrant4Cells, x4, y4, widthHalf, heightHalf, maxCellPerQuad);
+        } else {
+            Cells = cells;
+        }
+    }
+
+    public void DrawQuadTreeGizmos(float width, float height, int d = 0) {
+        
+        Color color = Color.green;
+
+        float widthHalf = width * 0.5f;
+        float heightHalf = height * 0.5f;
+
+        if (d == 0) {//draw frame
+            Debug.DrawLine(new Vector2(X - widthHalf, Y - heightHalf), new Vector2(X + Width - widthHalf, Y - heightHalf), color);
+            Debug.DrawLine(new Vector2(X - widthHalf, Y + Height - heightHalf), new Vector2(X + Width - widthHalf, Y + Height - heightHalf), color);
+            Debug.DrawLine(new Vector2(X - widthHalf, Y - heightHalf), new Vector2(X - widthHalf, Y + Height - heightHalf), color);
+            Debug.DrawLine(new Vector2(X + Width - widthHalf, Y - heightHalf), new Vector2(X + Width - widthHalf, Y + Height - heightHalf), color);
+        }
+
+        if (Cells == null) {//draw cross
+            Debug.DrawLine(new Vector2(X - widthHalf, Y + Height * 0.5f - heightHalf), new Vector2(X + Width - widthHalf, Y + Height * 0.5f - heightHalf), color);
+            Debug.DrawLine(new Vector2(X + Width * 0.5f - widthHalf, Y - heightHalf), new Vector2(X + Width * 0.5f - widthHalf, Y + Height - heightHalf), color);
+        }
+
+//        if (Cells != null) {//draw cell positions
+//            for (int i = 0; i < Cells.Count; i++) {
+//                Cell cell = Cells[i];
+//                float x = cell.X;
+//                float y = cell.Y;
+//                float crossSize = 0.3f;
+//                Debug.DrawLine(new Vector2(x - crossSize - widthHalf, y - crossSize - heightHalf), new Vector2(x + crossSize - widthHalf, y + crossSize - heightHalf), Color.green);
+//                Debug.DrawLine(new Vector2(x + crossSize - widthHalf, y - crossSize - heightHalf), new Vector2(x - crossSize - widthHalf, y + crossSize - heightHalf), Color.green);
+//            }
+//        }
+//
+        if (QuadTree1 != null) QuadTree1.DrawQuadTreeGizmos(width, height, d + 1);
+        if (QuadTree2 != null) QuadTree2.DrawQuadTreeGizmos(width, height, d + 2);
+        if (QuadTree3 != null) QuadTree3.DrawQuadTreeGizmos(width, height, d + 3);
+        if (QuadTree4 != null) QuadTree4.DrawQuadTreeGizmos(width, height, d + 4);
+    }
+}
+
 public class MapGenerator : MonoBehaviour {
 
-    private Vector2[] FourWayOffsets = new Vector2[4] {
-        new Vector2(0, 1),
-        new Vector2(1, 0),
-        new Vector2(0, -1),
-        new Vector2(-1, 0)
-    };
+    //    private Vector2[] FourWayOffsets = new Vector2[4] {
+    //        new Vector2(0, 1),
+    //        new Vector2(1, 0),
+    //        new Vector2(0, -1),
+    //        new Vector2(-1, 0)
+    //    };
 
     private int[][] EightWayOffsets = new int[8][] {
         new int[] { 0, 1 },
@@ -59,9 +157,10 @@ public class MapGenerator : MonoBehaviour {
     [SerializeField] public bool DrawGizmoLine;
     [Range(1, 10)][SerializeField] public int OutlineDetail = 1;
 
-    List<List<Cell>> Outlines;
+    private List<List<Cell>> Outlines;
     private Color[,] DebugMap;
-    HashSet<int> Visited;
+    private HashSet<int> Visited;
+    private QuadTree QuadTree;
 
     public int[,] GenerateMap() {
         int[,] map = new int[Width, Height];
@@ -180,15 +279,31 @@ public class MapGenerator : MonoBehaviour {
 
         Outlines = FindAllOutlines(map);
 
+        List<Cell> allOutlineCells = new List<Cell>();
+        for (int i = 0; i < Outlines.Count; i++) {
+            for (int j = 0; j < Outlines[i].Count; j++) {
+                allOutlineCells.Add(Outlines[i][j]);
+            }
+        }
+
+        QuadTree = new QuadTree(allOutlineCells, 0, 0, 100, 100);
+//        QuadTree = new QuadTree(
+//            new List<Cell> {
+//                new Cell(30, 30, 0),
+//                new Cell(60, 60, 0),
+//                new Cell(30, 60, 0),
+//            },
+//            0, 0, 100, 100);
+
         DebugMapRenderer.RenderColourMap(DebugMap);
     }
 
-    void OnDrawGizmos() {
+    private void DrawOutlinesGizmos(List<List<Cell>> outlines) {
         if (!DrawGizmoLine) return;
-        if (Outlines == null) return;
+        if (outlines == null) return;
 
-        for (int i = 0; i < Outlines.Count; i++) {
-            List<Cell> outline = Outlines[i];
+        for (int i = 0; i < outlines.Count; i++) {
+            List<Cell> outline = outlines[i];
 
             if (outline == null) continue;
             if (outline.Count == 0) continue;
@@ -203,6 +318,14 @@ public class MapGenerator : MonoBehaviour {
                 previousPoint = point;
             }
             Debug.DrawLine(point.GetPosition(), firstPoint.GetPosition(), Color.red);
+        }
+    }
+
+    void OnDrawGizmos() {
+        DrawOutlinesGizmos(Outlines);
+
+        if (QuadTree != null) {
+            QuadTree.DrawQuadTreeGizmos(100, 100);
         }
     }
 }
