@@ -10,7 +10,7 @@ public class Cell {
     public int Y;
     public int Value;
 
-    public int Index{ get { return Y * 100 + X; } }
+    public int Index{ get { return Y * Width + X; } }
 
     public Cell(int x, int y, int value) {
         X = x;
@@ -293,7 +293,7 @@ public class MapGenerator : MonoBehaviour {
 //                new Cell(60, 60, 0),
 //                new Cell(30, 60, 0),
 //            },
-//            0, 0, 100, 100);
+//            0, 0, 128, 128);
 
         DebugMapRenderer.RenderColourMap(DebugMap);
     }
