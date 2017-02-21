@@ -90,40 +90,47 @@ public class QuadTree {
         }
     }
 
-    public void DrawQuadTreeGizmos(float width, float height, int d = 0) {
+    public void DrawQuadTreeGizmos(float width, float height, int depth = 0) {
         
-        Color color = Color.green;
+        Color color = Color.black;
 
-        float widthHalf = width * 0.5f;
-        float heightHalf = height * 0.5f;
+        Vector2 offset = new Vector2(-width * 0.5f, -height * 0.5f);
 
-        if (d == 0) {//draw frame
-            Debug.DrawLine(new Vector2(X - widthHalf, Y - heightHalf), new Vector2(X + Width - widthHalf, Y - heightHalf), color);
-            Debug.DrawLine(new Vector2(X - widthHalf, Y + Height - heightHalf), new Vector2(X + Width - widthHalf, Y + Height - heightHalf), color);
-            Debug.DrawLine(new Vector2(X - widthHalf, Y - heightHalf), new Vector2(X - widthHalf, Y + Height - heightHalf), color);
-            Debug.DrawLine(new Vector2(X + Width - widthHalf, Y - heightHalf), new Vector2(X + Width - widthHalf, Y + Height - heightHalf), color);
+        if (depth == 0) {//draw frame
+
+            Vector2 a = new Vector2(X, Y) + offset;
+            Vector2 b = new Vector2(X + Width, Y) + offset;
+            Vector2 c = new Vector2(X, Y + Height) + offset;
+            Vector2 d = new Vector2(X + Width, Y + Height) + offset;
+
+            Debug.DrawLine(a, b, color);
+            Debug.DrawLine(c, d, color);
+            Debug.DrawLine(a, c, color);
+            Debug.DrawLine(b, d, color);
         }
 
         if (Cells == null) {//draw cross
-            Debug.DrawLine(new Vector2(X - widthHalf, Y + Height * 0.5f - heightHalf), new Vector2(X + Width - widthHalf, Y + Height * 0.5f - heightHalf), color);
-            Debug.DrawLine(new Vector2(X + Width * 0.5f - widthHalf, Y - heightHalf), new Vector2(X + Width * 0.5f - widthHalf, Y + Height - heightHalf), color);
+            Debug.DrawLine(new Vector2(X, Y + Height * 0.5f) + offset, new Vector2(X + Width, Y + Height * 0.5f) + offset, color);
+            Debug.DrawLine(new Vector2(X + Width * 0.5f, Y) + offset, new Vector2(X + Width * 0.5f, Y + Height) + offset, color);
         }
 
 //        if (Cells != null) {//draw cell positions
+//            Vector2 pixelOffset = Vector2.one * 0.5f;
 //            for (int i = 0; i < Cells.Count; i++) {
 //                Cell cell = Cells[i];
 //                float x = cell.X;
 //                float y = cell.Y;
 //                float crossSize = 0.3f;
-//                Debug.DrawLine(new Vector2(x - crossSize - widthHalf, y - crossSize - heightHalf), new Vector2(x + crossSize - widthHalf, y + crossSize - heightHalf), Color.green);
-//                Debug.DrawLine(new Vector2(x + crossSize - widthHalf, y - crossSize - heightHalf), new Vector2(x - crossSize - widthHalf, y + crossSize - heightHalf), Color.green);
+//                Debug.DrawLine(new Vector2(x - crossSize, y - crossSize) + offset + pixelOffset, new Vector2(x + crossSize, y + crossSize) + offset + pixelOffset, Color.green);
+//                Debug.DrawLine(new Vector2(x + crossSize, y - crossSize) + offset + pixelOffset, new Vector2(x - crossSize, y + crossSize) + offset + pixelOffset, Color.green);
 //            }
 //        }
-//
-        if (QuadTree1 != null) QuadTree1.DrawQuadTreeGizmos(width, height, d + 1);
-        if (QuadTree2 != null) QuadTree2.DrawQuadTreeGizmos(width, height, d + 2);
-        if (QuadTree3 != null) QuadTree3.DrawQuadTreeGizmos(width, height, d + 3);
-        if (QuadTree4 != null) QuadTree4.DrawQuadTreeGizmos(width, height, d + 4);
+
+        if (QuadTree1 != null) QuadTree1.DrawQuadTreeGizmos(width, height, depth + 1);
+        if (QuadTree2 != null) QuadTree2.DrawQuadTreeGizmos(width, height, depth + 2);
+        if (QuadTree3 != null) QuadTree3.DrawQuadTreeGizmos(width, height, depth + 3);
+        if (QuadTree4 != null) QuadTree4.DrawQuadTreeGizmos(width, height, depth + 4);
+    }
     }
 }
 
