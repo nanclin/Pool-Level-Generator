@@ -155,8 +155,8 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 169744216}
   m_LocalRotation: {x: -0.000000115202326, y: -0.7071067, z: 0.7071068, w: -0.00000011520231}
-  m_LocalScale: {x: 10, y: 0.1, z: 10}
   m_LocalPosition: {x: 128, y: -0, z: -1.2}
+  m_LocalScale: {x: 12.8, y: 0.1, z: 12.8}
   m_Children: []
   m_Father: {fileID: 619788656}
   m_RootOrder: 1
@@ -204,11 +204,13 @@ MonoBehaviour:
   InputMapRenderer: {fileID: 2100793120}
   DebugMapRenderer: {fileID: 169744217}
   InputImage: {fileID: 2800000, guid: b785a2ac10d05417a9177b9f4baceb57, type: 3}
-  Treshold: 0.47
   Width: 128
   Height: 128
+  Treshold: 0.39
   AutoUpdateGizmos: 1
-  DrawGizmoLine: 1
+  DrawOutlines: 1
+  DrawTriangulationLines: 0
+  DrawQuadTree: 1
   OutlineDetail: 1
 --- !u!1 &934295613
 GameObject:
@@ -367,7 +369,7 @@ Transform:
   m_GameObject: {fileID: 2100793119}
   m_LocalRotation: {x: -0.000000115202326, y: -0.7071067, z: 0.7071068, w: -0.00000011520231}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 10, y: 0.1, z: 10}
+  m_LocalScale: {x: 12.8, y: 0.1, z: 12.8}
   m_Children: []
   m_Father: {fileID: 619788656}
   m_RootOrder: 0

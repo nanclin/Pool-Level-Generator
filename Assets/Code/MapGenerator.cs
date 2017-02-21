@@ -131,6 +131,36 @@ public class QuadTree {
         if (QuadTree3 != null) QuadTree3.DrawQuadTreeGizmos(width, height, depth + 3);
         if (QuadTree4 != null) QuadTree4.DrawQuadTreeGizmos(width, height, depth + 4);
     }
+
+    public void DrawQuadTreeTriangulation(float width, float height) {
+
+        if (Cells != null) {
+            if (Cells.Count == 1) {
+                Color color = Color.black;
+
+                float widthHalf = width * 0.5f;
+                float heightHalf = height * 0.5f;
+
+                Vector2 offset = new Vector2(-widthHalf, -heightHalf);
+
+                Vector2 a = new Vector2(X, Y) + offset;
+                Vector2 b = new Vector2(X + Width, Y) + offset;
+                Vector2 c = new Vector2(X, Y + Height) + offset;
+                Vector2 d = new Vector2(X + Width, Y + Height) + offset;
+
+                Vector2 point = Cells[0].GetPosition();
+
+                Debug.DrawLine(a, point, color);
+                Debug.DrawLine(b, point, color);
+                Debug.DrawLine(c, point, color);
+                Debug.DrawLine(d, point, color);
+            }
+        } else {
+            QuadTree1.DrawQuadTreeTriangulation(width, height);
+            QuadTree2.DrawQuadTreeTriangulation(width, height);
+            QuadTree3.DrawQuadTreeTriangulation(width, height);
+            QuadTree4.DrawQuadTreeTriangulation(width, height);
+        }
     }
 }
 
@@ -161,7 +191,9 @@ public class MapGenerator : MonoBehaviour {
     [SerializeField] private  int Height;
     [Range(0, 1)] [SerializeField] private float Treshold;
     [SerializeField] public bool AutoUpdateGizmos;
-    [SerializeField] public bool DrawGizmoLine;
+    [SerializeField] public bool DrawOutlines;
+    [SerializeField] public bool DrawTriangulationLines;
+    [SerializeField] public bool DrawQuadTree;
     [Range(1, 10)][SerializeField] public int OutlineDetail = 1;
 
     private List<List<Cell>> Outlines;
@@ -216,18 +248,21 @@ public class MapGenerator : MonoBehaviour {
         return outlines;
     }
 
-    private List<Cell> FollowEdge(int[,] map, Cell cell, List<Cell> outline = null) {
+    private List<Cell> FollowEdge(int[,] map, Cell cell, List<Cell> outline = null, int d = 0) {
         
         if (outline == null) outline = new List<Cell>();
 
         Visited.Add(cell.Index);
-        outline.Add(cell);
-        DebugMap[cell.X, cell.Y] = Color.red;
+
+        if (d % 5 == 0) {
+            outline.Add(cell);
+            DebugMap[cell.X, cell.Y] = Color.red;
+        }
 
         Cell nextCell = GetNextEdgeCell(map, cell);
 
         if (nextCell != null) {
-            outline = FollowEdge(map, nextCell, outline);
+            outline = FollowEdge(map, nextCell, outline, d + 1);
         }
 
         return outline;
@@ -306,7 +341,7 @@ public class MapGenerator : MonoBehaviour {
     }
 
     private void DrawOutlinesGizmos(List<List<Cell>> outlines) {
-        if (!DrawGizmoLine) return;
+        if (!DrawOutlines) return;
         if (outlines == null) return;
 
         for (int i = 0; i < outlines.Count; i++) {
@@ -332,7 +367,10 @@ public class MapGenerator : MonoBehaviour {
         DrawOutlinesGizmos(Outlines);
 
         if (QuadTree != null) {
-            QuadTree.DrawQuadTreeGizmos(Width, Height);
+            if (DrawQuadTree)
+                QuadTree.DrawQuadTreeGizmos(Width, Height);
+            if (DrawTriangulationLines)
+                QuadTree.DrawQuadTreeTriangulation(Width, Height);
         }
     }
 }
