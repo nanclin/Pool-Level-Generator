@@ -201,16 +201,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7a429e04e1bf48458dcdbc54b921446, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  InputMapRenderer: {fileID: 2100793120}
+  ImageMapRenderer: {fileID: 2100793120}
   DebugMapRenderer: {fileID: 169744217}
   InputImage: {fileID: 2800000, guid: b785a2ac10d05417a9177b9f4baceb57, type: 3}
   Width: 128
   Height: 128
   Treshold: 0.39
   AutoUpdateGizmos: 1
-  DrawOutlines: 1
+  DrawOutlines: 0
   DrawTriangulationLines: 0
   DrawQuadTree: 1
+  MaxDepth: 6
   OutlineDetail: 1
 --- !u!1 &934295613
 GameObject:
@@ -310,7 +311,7 @@ GameObject:
   - 23: {fileID: 2100793121}
   - 114: {fileID: 2100793120}
   m_Layer: 0
-  m_Name: InputMapRenderer
+  m_Name: ImageMapRenderer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
