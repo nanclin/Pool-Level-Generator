@@ -17,6 +17,7 @@ public class MapGenerator : MonoBehaviour {
     [SerializeField] private MapRenderer ImageMapRenderer;
     [SerializeField] private MapRenderer DebugMapRenderer;
     [SerializeField] private Texture2D InputImage;
+    [SerializeField] private MeshGenerator MeshGenerator;
     [SerializeField] private int Width;
     [SerializeField] private  int Height;
     [Range(0, 1)] [SerializeField] private float Treshold;
@@ -147,6 +148,9 @@ public class MapGenerator : MonoBehaviour {
     }
 
     public void RenderMap() {
+        MeshGenerator.GenerateMesh();
+        return;
+
         int[,] map = GenerateMapFromImage(InputImage);
         ImageMapRenderer.RenderBitMap(map);
 
