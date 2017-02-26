@@ -32,7 +32,7 @@ public class MeshData {
         VertexIndex += 3;
     }
 
-    public void AddQuad(float x, float y, float width, float height) {
+    public void AddQuad(float x, float y, float width, float height, Vector2[] uvs = null) {
         Vector3 a = new Vector3(x, y);
         Vector3 b = new Vector3(x + width, y);
         Vector3 c = new Vector3(x, y + height);
@@ -43,10 +43,17 @@ public class MeshData {
         Vertices.Add(c);
         Vertices.Add(d);
 
-        UVs.Add(new Vector2(0, 0));
-        UVs.Add(new Vector2(1, 0));
-        UVs.Add(new Vector2(0, 1));
-        UVs.Add(new Vector2(1, 1));
+        if (uvs == null) {
+            UVs.Add(new Vector2(0, 0));
+            UVs.Add(new Vector2(1, 0));
+            UVs.Add(new Vector2(0, 1));
+            UVs.Add(new Vector2(1, 1));
+        } else {
+            UVs.Add(uvs[0]);
+            UVs.Add(uvs[1]);
+            UVs.Add(uvs[2]);
+            UVs.Add(uvs[3]);
+        }
 
         Triangles.Add(VertexIndex + 0);
         Triangles.Add(VertexIndex + 2);
@@ -57,5 +64,19 @@ public class MeshData {
         Triangles.Add(VertexIndex + 1);
 
         VertexIndex += 4;
+    }
+
+    public Mesh SetMesh(Mesh mesh, string name) {
+
+        mesh.name = name;
+
+        mesh.vertices = Vertices.ToArray();
+        mesh.triangles = Triangles.ToArray();
+        mesh.uv = UVs.ToArray();
+
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
+
+        return mesh;
     }
 }

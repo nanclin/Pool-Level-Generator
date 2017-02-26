@@ -7,8 +7,6 @@ public class QuadTree {
     public float Width;
     public float Height;
 
-    private int Value;
-
     public List<Cell> Cells;
 
     public QuadTree QuadTree1;
@@ -16,12 +14,27 @@ public class QuadTree {
     public QuadTree QuadTree3;
     public QuadTree QuadTree4;
 
+    public int Value { get; private set; }
+
+    public int MaxDepth { get; private set; }
+
+    public bool IsLeaf {
+        get {
+            return
+                QuadTree1 == null &&
+            QuadTree2 == null &&
+            QuadTree3 == null &&
+            QuadTree4 == null;
+        }
+    }
+
     public  QuadTree(List<Cell> cells, float x, float y, float width, float height, int maxDepth, int maxCellPerQuad = 4, int d = 0) {
 
         X = x;
         Y = y;
         Width = width;
         Height = height;
+        MaxDepth = maxDepth;
 
         bool fullQuad = cells.Count >= Mathf.Pow(Width, 2);
         Value = fullQuad ? 1 : 0;
@@ -66,6 +79,8 @@ public class QuadTree {
             Cells = cells;
         }
     }
+
+#region Draw gizmos
 
     public void DrawQuadTreeGizmos(float width, float height, int depth = 0) {
 
@@ -144,4 +159,6 @@ public class QuadTree {
             QuadTree4.DrawQuadTreeTriangulation(width, height);
         }
     }
+
+#endregion
 }

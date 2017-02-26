@@ -148,8 +148,8 @@ public class MapGenerator : MonoBehaviour {
     }
 
     public void RenderMap() {
-        MeshGenerator.GenerateMesh();
-        return;
+//        MeshGenerator.GenerateMesh();
+//        return;
 
         int[,] map = GenerateMapFromImage(InputImage);
         ImageMapRenderer.RenderBitMap(map);
@@ -174,6 +174,8 @@ public class MapGenerator : MonoBehaviour {
         QuadTree = new QuadTree(fillPixels, 0, 0, Width, Height, MaxDepth);
 
         DebugMapRenderer.RenderColourMap(DebugMap);
+
+        MeshGenerator.GenerateQuadTreeMesh(QuadTree);
     }
 
     private void DrawOutlinesGizmos(List<List<Cell>> outlines) {
