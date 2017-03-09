@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public class MeshData {
 
@@ -16,7 +17,11 @@ public class MeshData {
         UVs = new List<Vector2>();
     }
 
-    public void AddTriangle(Vector3 A, Vector3 B, Vector3 C) {
+    public void AddTriangle(Vector3 A, Vector3 B, Vector3 C, Vector2[] uvs = null) {
+
+        if (uvs != null)
+            Assert.IsTrue(uvs.Length == 3, "Number of uvs must match number of vertices!");
+
         Vertices.Add(A);
         Vertices.Add(B);
         Vertices.Add(C);
@@ -25,9 +30,15 @@ public class MeshData {
         Triangles.Add(VertexIndex + 1);
         Triangles.Add(VertexIndex + 2);
 
-        UVs.Add(new Vector2(0, 0));
-        UVs.Add(new Vector2(0, 1));
-        UVs.Add(new Vector2(1, 1));
+        if (uvs == null) {
+            UVs.Add(new Vector2(0, 0));
+            UVs.Add(new Vector2(0, 1));
+            UVs.Add(new Vector2(1, 1));
+        } else {
+            UVs.Add(uvs[0]);
+            UVs.Add(uvs[1]);
+            UVs.Add(uvs[2]);
+        }
 
         VertexIndex += 3;
     }

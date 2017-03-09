@@ -96,101 +96,104 @@ public class MeshGenerator : MonoBehaviour {
     public void GenerateMSTile(QuadTree quadTree, int tileIndex, float x, float y, float tileSize, MeshData meshData) {
         if (tileIndex == 0) return;
 
-////             draw whole texture
-//        float rootSize = quadTree.Root.Size + tileSize;
-//        float u = x / rootSize - 0.5f;
-//        float v = y / rootSize - 0.5f;
-//        float quadSize = tileSize / rootSize;
-//        Vector2[] uvs = new Vector2[] {
-//            new Vector2(u, v),
-//            new Vector2(u + quadSize, v),
-//            new Vector2(u, v + quadSize),
-//            new Vector2(u + quadSize, v + quadSize),
-//        };
-//
-//        meshData.AddQuad(x, y, tileSize, uvs);
-//        return;
+        float rootSize = quadTree.Root.Size + tileSize;
+        float u = x / rootSize - 0.5f;
+        float v = y / rootSize - 0.5f;
+        float quadSize = tileSize / rootSize;
 
         Vector3 a = new Vector2(x, y);
         Vector3 b = new Vector2(x + tileSize, y);
         Vector3 c = new Vector2(x, y + tileSize);
         Vector3 d = new Vector2(x + tileSize, y + tileSize);
 
+        Vector3 aUV = new Vector2(u, v);
+        Vector3 bUV = new Vector2(u + quadSize, v);
+        Vector3 cUV = new Vector2(u, v + quadSize);
+        Vector3 dUV = new Vector2(u + quadSize, v + quadSize);
+
         float tileSizeHalf = tileSize * 0.5f;
+        float quadSizeHalf = quadSize * 0.5f;
 
         Vector3 s = new Vector2(x + tileSizeHalf, y);
         Vector3 n = new Vector2(x + tileSizeHalf, y + tileSize);
         Vector3 w = new Vector2(x, y + tileSizeHalf);
         Vector3 e = new Vector2(x + tileSize, y + tileSizeHalf);
 
+        Vector3 sUV = new Vector2(u + quadSizeHalf, v);
+        Vector3 nUV = new Vector2(u + quadSizeHalf, v + quadSize);
+        Vector3 wUV = new Vector2(u, v + quadSizeHalf);
+        Vector3 eUV = new Vector2(u + quadSize, v + quadSizeHalf);
+
         switch (tileIndex) {
             case 1:
-                meshData.AddTriangle(a, w, s);
+                meshData.AddTriangle(a, w, s, new Vector2[]{ aUV, wUV, sUV });
                 break;
             case 2:
-                meshData.AddTriangle(s, e, b);
+                meshData.AddTriangle(s, e, b, new Vector2[]{ sUV, eUV, bUV });
                 break;
             case 3:
-                meshData.AddTriangle(a, w, e);
-                meshData.AddTriangle(a, e, b);
+                meshData.AddTriangle(a, w, e, new Vector2[]{ aUV, wUV, eUV });
+                meshData.AddTriangle(a, e, b, new Vector2[]{ aUV, eUV, bUV });
                 break;
             case 4:
-                meshData.AddTriangle(n, d, e);
+                meshData.AddTriangle(n, d, e, new Vector2[]{ nUV, dUV, eUV });
                 break;
             case 5:
-                meshData.AddTriangle(a, w, n);
-                meshData.AddTriangle(a, n, d);
-                meshData.AddTriangle(a, d, e);
-                meshData.AddTriangle(a, e, s);
+                meshData.AddTriangle(a, w, n, new Vector2[]{ aUV, wUV, nUV });
+                meshData.AddTriangle(a, n, d, new Vector2[]{ aUV, nUV, dUV });
+                meshData.AddTriangle(a, d, e, new Vector2[]{ aUV, dUV, eUV });
+                meshData.AddTriangle(a, e, s, new Vector2[]{ aUV, eUV, sUV });
                 break;
             case 6:
-                meshData.AddTriangle(s, n, d);
-                meshData.AddTriangle(s, d, b);
+                meshData.AddTriangle(s, n, d, new Vector2[]{ sUV, nUV, dUV });
+                meshData.AddTriangle(s, d, b, new Vector2[]{ sUV, dUV, bUV });
                 break;
             case 7:
-                meshData.AddTriangle(a, w, n);
-                meshData.AddTriangle(a, n, d);
-                meshData.AddTriangle(a, d, e);
-                meshData.AddTriangle(a, e, b);
+                meshData.AddTriangle(a, w, n, new Vector2[]{ aUV, wUV, nUV });
+                meshData.AddTriangle(a, n, d, new Vector2[]{ aUV, nUV, dUV });
+                meshData.AddTriangle(a, d, e, new Vector2[]{ aUV, dUV, eUV });
+                meshData.AddTriangle(a, e, b, new Vector2[]{ aUV, eUV, bUV });
                 break;
             case 8:
-                meshData.AddTriangle(w, c, n);
+                meshData.AddTriangle(w, c, n, new Vector2[]{ wUV, cUV, nUV });
                 break;
             case 9:
-                meshData.AddTriangle(a, c, n);
-                meshData.AddTriangle(a, n, s);
+                meshData.AddTriangle(a, c, n, new Vector2[]{ aUV, cUV, nUV });
+                meshData.AddTriangle(a, n, s, new Vector2[]{ aUV, nUV, sUV });
                 break;
             case 10:
-                meshData.AddTriangle(w, c, n);
-                meshData.AddTriangle(w, n, e);
-                meshData.AddTriangle(w, e, b);
-                meshData.AddTriangle(w, b, s);
+                meshData.AddTriangle(w, c, n, new Vector2[]{ wUV, cUV, nUV });
+                meshData.AddTriangle(w, n, e, new Vector2[]{ wUV, nUV, eUV });
+                meshData.AddTriangle(w, e, b, new Vector2[]{ wUV, eUV, bUV });
+                meshData.AddTriangle(w, b, s, new Vector2[]{ wUV, bUV, sUV });
                 break;
             case 11:
-                meshData.AddTriangle(a, c, n);
-                meshData.AddTriangle(a, n, e);
-                meshData.AddTriangle(a, e, b);
+                meshData.AddTriangle(a, c, n, new Vector2[]{ aUV, cUV, nUV });
+                meshData.AddTriangle(a, n, e, new Vector2[]{ aUV, nUV, eUV });
+                meshData.AddTriangle(a, e, b, new Vector2[]{ aUV, eUV, bUV });
                 break;
             case 12:
-                meshData.AddTriangle(w, c, d);
-                meshData.AddTriangle(w, d, e);
+                meshData.AddTriangle(w, c, d, new Vector2[]{ wUV, cUV, dUV });
+                meshData.AddTriangle(w, d, e, new Vector2[]{ wUV, dUV, eUV });
                 break;
             case 13:
-                meshData.AddTriangle(a, c, d);
-                meshData.AddTriangle(a, d, e);
-                meshData.AddTriangle(a, e, s);
+                meshData.AddTriangle(a, c, d, new Vector2[]{ aUV, cUV, dUV });
+                meshData.AddTriangle(a, d, e, new Vector2[]{ aUV, dUV, eUV });
+                meshData.AddTriangle(a, e, s, new Vector2[]{ aUV, eUV, sUV });
                 break;
             case 14:
-                meshData.AddTriangle(w, c, d);
-                meshData.AddTriangle(w, d, b);
-                meshData.AddTriangle(w, b, s);
+                meshData.AddTriangle(w, c, d, new Vector2[]{ wUV, cUV, dUV });
+                meshData.AddTriangle(w, d, b, new Vector2[]{ wUV, dUV, bUV });
+                meshData.AddTriangle(w, b, s, new Vector2[]{ wUV, bUV, sUV });
                 break;
             case 15:
-                meshData.AddTriangle(a, c, d);
-                meshData.AddTriangle(a, d, b);
+                meshData.AddTriangle(a, c, d, new Vector2[]{ aUV, cUV, dUV });
+                meshData.AddTriangle(a, d, b, new Vector2[]{ aUV, dUV, bUV });
                 break;
         }
     }
+
+    //    private void AddMarchingSquaresTileTriangles(int tileIndex){
 
     public void GenerateQuadTreeMesh(QuadTree quadTree, int depth = 0, MeshData meshData = null) {
 
