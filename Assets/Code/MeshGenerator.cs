@@ -5,6 +5,9 @@ public class MeshGenerator : MonoBehaviour {
 
     [SerializeField] private MeshFilter MeshFilter;
     [SerializeField] private MeshRenderer MeshRenderer;
+    [SerializeField] private float PerlinScale = 1;
+    [SerializeField] private Vector2 PerlinOffset;
+    [SerializeField] private float PerlinTreshold = 0.5f;
 
     public void GenerateMesh() {
         Mesh mesh = MeshFilter.mesh;
@@ -36,12 +39,13 @@ public class MeshGenerator : MonoBehaviour {
             for (int x = 0; x < cells + 1; x++) {
 //                Debug.Log(string.Format("x={0} y={1}", x, y));
 
-//                int tileIndex = 0;
-//
-//                for (int i = 0; i < 4; i++) {
-//                    int ix = x + i % 2;
-//                    int iy = y + i / 2;
-//
+                int tileIndex = 0;
+
+                for (int i = 0; i < 4; i++) {
+                    int ix = x + i % 2;
+                    int iy = y + i / 2;
+
+
 //                    int value = -1;
 //
 //                    if (ix >= cells) value = 0;
@@ -62,11 +66,19 @@ public class MeshGenerator : MonoBehaviour {
 //                    if (value == 1) {
 //                        tileIndex += (int) Mathf.Pow(2, i);
 //                    }
-//                }
+
+                    float p = Mathf.PerlinNoise(ix * PerlinScale, iy * PerlinScale);
+                    int value = p > PerlinTreshold ? 1 : 0;
+//                    Debug.Log(string.Format("x={0}, y={1} | ix={2} iy={3} p={4}", x, y, ix, iy, p));
+
+                    if (value == 1) {
+                        tileIndex += (int) Mathf.Pow(2, i);
+                    }
+                }
 
                 float tileXPos = x * tileSize - quadTree.Size * 0.5f - tileSize * 0.5f;
                 float tileYPos = y * tileSize - quadTree.Size * 0.5f - tileSize * 0.5f;
-                GenerateMSTile(quadTree, 1, tileXPos, tileYPos, tileSize, meshData);
+                GenerateMSTile(quadTree, tileIndex, tileXPos, tileYPos, tileSize, meshData);
 
             }
         }
@@ -75,11 +87,10 @@ public class MeshGenerator : MonoBehaviour {
     }
 
     public void GenerateMSTile(QuadTree quadTree, int tileIndex, float x, float y, float tileSize, MeshData meshData) {
-//        if (tileIndex == 0) return;
+        if (tileIndex == 0) return;
 
         // draw whole texture
         float rootSize = quadTree.Root.Size + tileSize;
-        float rootSizeHalf = rootSize * 0.5f;
         float u = x / rootSize - 0.5f;
         float v = y / rootSize - 0.5f;
         float quadSize = tileSize / rootSize;
@@ -89,7 +100,7 @@ public class MeshGenerator : MonoBehaviour {
             new Vector2(u, v + quadSize),
             new Vector2(u + quadSize, v + quadSize),
         };
-        
+
         meshData.AddQuad(x, y, tileSize, uvs);
     }
 
