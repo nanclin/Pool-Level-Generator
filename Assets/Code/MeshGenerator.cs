@@ -14,11 +14,11 @@ public class MeshGenerator : MonoBehaviour {
         meshData.AddTriangle(new Vector3(0, 0, 0), new Vector3(0, 1, 0), new Vector3(1, 1, 0));
         meshData.AddTriangle(new Vector3(0, 0, 0), new Vector3(1, 1, 0), new Vector3(1, 0, 0));
 
-        meshData.AddQuad(0, 2, 1, 1);
-        meshData.AddQuad(1, 2, 2, 2);
-        meshData.AddQuad(3, 2, 1, 3);
+//        meshData.AddQuad(0, 2, 1, 1);
+//        meshData.AddQuad(1, 2, 2, 2);
+//        meshData.AddQuad(3, 2, 1, 3);
 
-        MeshFilter.mesh = meshData.SetMesh(mesh, "newMesh");
+        meshData.SetMesh(MeshFilter.mesh, "newMesh");
     }
 
     public void GenerateMapMesh(int[,] map) {
@@ -44,31 +44,30 @@ public class MeshGenerator : MonoBehaviour {
 //            };
 
             // draw whole texture
-            float x = quadTree.X / 128f;
-            float y = quadTree.Y / 128f;
-            float width = quadTree.Width / 128f;
-            float height = quadTree.Height / 128f;
+            float rootSize = quadTree.Root.Size;
+            float rootSizeHalf = rootSize * 0.5f;
+            float x = quadTree.x / rootSize - rootSizeHalf;
+            float y = quadTree.y / rootSize - rootSizeHalf;
+            float quadSize = quadTree.Size / rootSize;
             Vector2[] uvs = new Vector2[] {
                 new Vector2(x, y),
-                new Vector2(x + width, y),
-                new Vector2(x, y + height),
-                new Vector2(x + width, y + height),
+                new Vector2(x + quadSize, y),
+                new Vector2(x, y + quadSize),
+                new Vector2(x + quadSize, y + quadSize),
             };
 
-            meshData.AddQuad(quadTree.X, quadTree.Y, quadTree.Width, quadTree.Height, uvs);
+            meshData.AddQuad(quadTree.x - rootSizeHalf, quadTree.y - rootSizeHalf, quadTree.Size, uvs);
 
             return;
         } else {
-            GenerateQuadTreeMesh(quadTree.QuadTree1, depth + 1, meshData);
-            GenerateQuadTreeMesh(quadTree.QuadTree2, depth + 1, meshData);
-            GenerateQuadTreeMesh(quadTree.QuadTree3, depth + 1, meshData);
-            GenerateQuadTreeMesh(quadTree.QuadTree4, depth + 1, meshData);
+            GenerateQuadTreeMesh(quadTree.SubQuadTrees[0], depth + 1, meshData);
+            GenerateQuadTreeMesh(quadTree.SubQuadTrees[1], depth + 1, meshData);
+            GenerateQuadTreeMesh(quadTree.SubQuadTrees[2], depth + 1, meshData);
+            GenerateQuadTreeMesh(quadTree.SubQuadTrees[3], depth + 1, meshData);
         }
 
         if (depth == 0) {// do this only for the root
-            Debug.Log(string.Format("seting mesh, depth={0}", depth));
-            MeshFilter.mesh.Clear();
-            MeshFilter.mesh = meshData.SetMesh(MeshFilter.mesh, "newMesh");
+            meshData.SetMesh(MeshFilter.mesh, "QuadTreeMesh");
         }
     }
 }

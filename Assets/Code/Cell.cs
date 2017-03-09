@@ -2,24 +2,24 @@
 
 public class Cell {
 
-    private int Width = 128;
-    private int Height = 128;
+    public int QuadTreeSize { get; private set; }
 
     public int X;
     public int Y;
     public int Value;
 
-    public int Index{ get { return Y * Width + X; } }
+    public int Index{ get { return Y * QuadTreeSize + X; } }
 
-    public Cell(int x, int y, int value) {
+    public Cell(int x, int y, int quadTreeSize, int value) {
         X = x;
         Y = y;
         Value = value;
     }
 
     public Vector2 GetPosition() {
-        float x = X - Width / 2 + 0.5f;
-        float y = Y - Height / 2 + 0.5f;
+        float QuadTreeSizeHalf = QuadTreeSize * 0.5f;
+        float x = X - QuadTreeSizeHalf + 0.5f;
+        float y = Y - QuadTreeSizeHalf + 0.5f;
         return new Vector2(x, y);
     }
 

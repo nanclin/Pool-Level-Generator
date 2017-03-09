@@ -14,7 +14,7 @@ public class MapRenderer : MonoBehaviour {
         Color[] colourMap = new Color[width * height];
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                colourMap[y * width + x] = (map[x, y] == 1) ? Color.white : Color.black;
+                colourMap[y * width + x] = (map[x, y] == 1) ? Color.clear : Color.black;
             }
         }
 

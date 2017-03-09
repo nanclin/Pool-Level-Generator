@@ -32,11 +32,11 @@ public class MeshData {
         VertexIndex += 3;
     }
 
-    public void AddQuad(float x, float y, float width, float height, Vector2[] uvs = null) {
+    public void AddQuad(float x, float y, float size, Vector2[] uvs = null) {
         Vector3 a = new Vector3(x, y);
-        Vector3 b = new Vector3(x + width, y);
-        Vector3 c = new Vector3(x, y + height);
-        Vector3 d = new Vector3(x + width, y + height);
+        Vector3 b = new Vector3(x + size, y);
+        Vector3 c = new Vector3(x, y + size);
+        Vector3 d = new Vector3(x + size, y + size);
 
         Vertices.Add(a);
         Vertices.Add(b);
@@ -66,7 +66,9 @@ public class MeshData {
         VertexIndex += 4;
     }
 
-    public Mesh SetMesh(Mesh mesh, string name) {
+    public void SetMesh(Mesh mesh, string name) {
+
+        mesh.Clear();
 
         mesh.name = name;
 
@@ -76,7 +78,5 @@ public class MeshData {
 
         mesh.RecalculateNormals();
         mesh.RecalculateBounds();
-
-        return mesh;
     }
 }

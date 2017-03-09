@@ -18,12 +18,10 @@ public class MapGenerator : MonoBehaviour {
     [SerializeField] private MapRenderer DebugMapRenderer;
     [SerializeField] private Texture2D InputImage;
     [SerializeField] private MeshGenerator MeshGenerator;
-    [SerializeField] private int Width;
-    [SerializeField] private  int Height;
+    [SerializeField] private int Size;
     [Range(0, 1)] [SerializeField] private float Treshold;
     [SerializeField] public bool AutoUpdateGizmos;
     [SerializeField] public bool DrawOutlines;
-    [SerializeField] public bool DrawTriangulationLines;
     [SerializeField] public bool DrawQuadTree;
     [SerializeField] public int MaxDepth = 5;
     [Range(1, 10)][SerializeField] public int OutlineDetail = 1;
@@ -34,13 +32,13 @@ public class MapGenerator : MonoBehaviour {
     private QuadTree QuadTree;
 
     public int[,] GenerateMapFromImage(Texture2D inputImage) {
-        int[,] map = new int[Width, Height];
+        int[,] map = new int[Size, Size];
         Visited = new HashSet<int>();
-        DebugMap = new Color[Width, Height];
+        DebugMap = new Color[Size, Size];
 
-        for (int y = 0; y < Height; y++) {
-            for (int x = 0; x < Width; x++) {
-                if (x == 0 || x == Width - 1 || y == 0 || y == Height - 1) {
+        for (int y = 0; y < Size; y++) {
+            for (int x = 0; x < Size; x++) {
+                if (x == 0 || x == Size - 1 || y == 0 || y == Size - 1) {
                     map[x, y] = 0;
                     continue;
                 }
@@ -55,12 +53,12 @@ public class MapGenerator : MonoBehaviour {
 
         List<List<Cell>> outlines = new List<List<Cell>>();
 
-        for (int x = 0; x < Width; x++) {
-            for (int y = 0; y < Height; y++) {
+        for (int x = 0; x < Size; x++) {
+            for (int y = 0; y < Size; y++) {
 
                 //                DebugMap[x, y] = Color.cyan;//mark visited
 
-                Cell cell = new Cell(x, y, map[x, y]);
+                Cell cell = new Cell(x, y, (int) Size, map[x, y]);
 
                 if (!Visited.Contains(cell.Index)) {
 
@@ -128,9 +126,9 @@ public class MapGenerator : MonoBehaviour {
             int x = cell.X + EightWayOffsets[i][0];
             int y = cell.Y + EightWayOffsets[i][1];
 
-            if (x < 0 || x >= Width || y < 0 || y >= Height) continue;
+            if (x < 0 || x >= Size || y < 0 || y >= Size) continue;
 
-            neighbourCells.Add(new Cell(x, y, map[x, y]));
+            neighbourCells.Add(new Cell(x, y, Size, map[x, y]));
         }
 
         return neighbourCells;
@@ -164,16 +162,16 @@ public class MapGenerator : MonoBehaviour {
 //        }
 
         List<Cell> fillPixels = new List<Cell>();
-        for (int y = 0; y < Height; y++) {
-            for (int x = 0; x < Width; x++) {
+        for (int y = 0; y < Size; y++) {
+            for (int x = 0; x < Size; x++) {
                 if (map[x, y] == 0)
-                    fillPixels.Add(new Cell(x, y, 0));
+                    fillPixels.Add(new Cell(x, y, Size, 0));
             }
         }
 
-        QuadTree = new QuadTree(fillPixels, 0, 0, Width, Height, MaxDepth);
+        QuadTree = new QuadTree(fillPixels, 0, 0, Size, MaxDepth, 4);
 
-        DebugMapRenderer.RenderColourMap(DebugMap);
+        Debug.Log(string.Format("{0}", QuadTree));
 
         MeshGenerator.GenerateQuadTreeMesh(QuadTree);
     }
@@ -206,9 +204,7 @@ public class MapGenerator : MonoBehaviour {
 
         if (QuadTree != null) {
             if (DrawQuadTree)
-                QuadTree.DrawQuadTreeGizmos(Width, Height);
-            if (DrawTriangulationLines)
-                QuadTree.DrawQuadTreeTriangulation(Width, Height);
+                QuadTree.DrawQuadTreeGizmos(Size);
         }
     }
 }
