@@ -9,6 +9,13 @@ public class MeshGenerator : MonoBehaviour {
     [SerializeField] private Vector2 PerlinOffset;
     [SerializeField] private float PerlinTreshold = 0.5f;
 
+    private  int[,] CornerIndices = {
+        { 0, 0 },
+        { 1, 0 },
+        { 1, 1 },
+        { 0, 1 },
+    };
+
     public void GenerateMesh() {
         Mesh mesh = MeshFilter.mesh;
 
@@ -42,8 +49,8 @@ public class MeshGenerator : MonoBehaviour {
                 int tileIndex = 0;
 
                 for (int i = 0; i < 4; i++) {
-                    int ix = x + i % 2;
-                    int iy = y + i / 2;
+                    int ix = x + CornerIndices[i, 0];
+                    int iy = y + CornerIndices[i, 1];
 
 
 //                    int value = -1;
@@ -89,19 +96,100 @@ public class MeshGenerator : MonoBehaviour {
     public void GenerateMSTile(QuadTree quadTree, int tileIndex, float x, float y, float tileSize, MeshData meshData) {
         if (tileIndex == 0) return;
 
-        // draw whole texture
-        float rootSize = quadTree.Root.Size + tileSize;
-        float u = x / rootSize - 0.5f;
-        float v = y / rootSize - 0.5f;
-        float quadSize = tileSize / rootSize;
-        Vector2[] uvs = new Vector2[] {
-            new Vector2(u, v),
-            new Vector2(u + quadSize, v),
-            new Vector2(u, v + quadSize),
-            new Vector2(u + quadSize, v + quadSize),
-        };
+////             draw whole texture
+//        float rootSize = quadTree.Root.Size + tileSize;
+//        float u = x / rootSize - 0.5f;
+//        float v = y / rootSize - 0.5f;
+//        float quadSize = tileSize / rootSize;
+//        Vector2[] uvs = new Vector2[] {
+//            new Vector2(u, v),
+//            new Vector2(u + quadSize, v),
+//            new Vector2(u, v + quadSize),
+//            new Vector2(u + quadSize, v + quadSize),
+//        };
+//
+//        meshData.AddQuad(x, y, tileSize, uvs);
+//        return;
 
-        meshData.AddQuad(x, y, tileSize, uvs);
+        Vector3 a = new Vector2(x, y);
+        Vector3 b = new Vector2(x + tileSize, y);
+        Vector3 c = new Vector2(x, y + tileSize);
+        Vector3 d = new Vector2(x + tileSize, y + tileSize);
+
+        float tileSizeHalf = tileSize * 0.5f;
+
+        Vector3 s = new Vector2(x + tileSizeHalf, y);
+        Vector3 n = new Vector2(x + tileSizeHalf, y + tileSize);
+        Vector3 w = new Vector2(x, y + tileSizeHalf);
+        Vector3 e = new Vector2(x + tileSize, y + tileSizeHalf);
+
+        switch (tileIndex) {
+            case 1:
+                meshData.AddTriangle(a, w, s);
+                break;
+            case 2:
+                meshData.AddTriangle(s, e, b);
+                break;
+            case 3:
+                meshData.AddTriangle(a, w, e);
+                meshData.AddTriangle(a, e, b);
+                break;
+            case 4:
+                meshData.AddTriangle(n, d, e);
+                break;
+            case 5:
+                meshData.AddTriangle(a, w, n);
+                meshData.AddTriangle(a, n, d);
+                meshData.AddTriangle(a, d, e);
+                meshData.AddTriangle(a, e, s);
+                break;
+            case 6:
+                meshData.AddTriangle(s, n, d);
+                meshData.AddTriangle(s, d, b);
+                break;
+            case 7:
+                meshData.AddTriangle(a, w, n);
+                meshData.AddTriangle(a, n, d);
+                meshData.AddTriangle(a, d, e);
+                meshData.AddTriangle(a, e, b);
+                break;
+            case 8:
+                meshData.AddTriangle(w, c, n);
+                break;
+            case 9:
+                meshData.AddTriangle(a, c, n);
+                meshData.AddTriangle(a, n, s);
+                break;
+            case 10:
+                meshData.AddTriangle(w, c, n);
+                meshData.AddTriangle(w, n, e);
+                meshData.AddTriangle(w, e, b);
+                meshData.AddTriangle(w, b, s);
+                break;
+            case 11:
+                meshData.AddTriangle(a, c, n);
+                meshData.AddTriangle(a, n, e);
+                meshData.AddTriangle(a, e, b);
+                break;
+            case 12:
+                meshData.AddTriangle(w, c, d);
+                meshData.AddTriangle(w, d, e);
+                break;
+            case 13:
+                meshData.AddTriangle(a, c, d);
+                meshData.AddTriangle(a, d, e);
+                meshData.AddTriangle(a, e, s);
+                break;
+            case 14:
+                meshData.AddTriangle(w, c, d);
+                meshData.AddTriangle(w, d, b);
+                meshData.AddTriangle(w, b, s);
+                break;
+            case 15:
+                meshData.AddTriangle(a, c, d);
+                meshData.AddTriangle(a, d, b);
+                break;
+        }
     }
 
     public void GenerateQuadTreeMesh(QuadTree quadTree, int depth = 0, MeshData meshData = null) {
