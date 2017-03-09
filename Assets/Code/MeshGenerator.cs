@@ -24,6 +24,75 @@ public class MeshGenerator : MonoBehaviour {
     public void GenerateMapMesh(int[,] map) {
     }
 
+    public void GenerateMarchingSquaresMesh(QuadTree quadTree) {
+        
+        MeshData meshData = new MeshData();
+
+        float tileSize = quadTree.Size / quadTree.CellsPerSide;
+
+        int cells = quadTree.CellsPerSide;
+
+        for (int y = 0; y < cells + 1; y++) {
+            for (int x = 0; x < cells + 1; x++) {
+//                Debug.Log(string.Format("x={0} y={1}", x, y));
+
+//                int tileIndex = 0;
+//
+//                for (int i = 0; i < 4; i++) {
+//                    int ix = x + i % 2;
+//                    int iy = y + i / 2;
+//
+//                    int value = -1;
+//
+//                    if (ix >= cells) value = 0;
+//                    if (iy >= cells) value = 0;
+//                    else {
+//                        QuadTree quadTreeAtPosition = quadTree.QuadTreeAtPosition(ix, iy);
+//                        Debug.Log(string.Format("x={0}, y={1} | ix={2} iy={3} \nquadTreeAtPosition={4}", x, y, ix, iy, quadTreeAtPosition));
+//                        if (quadTreeAtPosition != null) {
+//                            bool fullQuad = quadTreeAtPosition.Cells.Count >= Mathf.Pow(quadTreeAtPosition.Size, 2) / 2;
+//                            value = fullQuad ? 1 : 0;
+//                        }
+//                    }
+//
+//
+////                    Debug.Log(string.Format("value={0} x={1} y={2}", value, x, y));
+//
+//
+//                    if (value == 1) {
+//                        tileIndex += (int) Mathf.Pow(2, i);
+//                    }
+//                }
+
+                float tileXPos = x * tileSize - quadTree.Size * 0.5f - tileSize * 0.5f;
+                float tileYPos = y * tileSize - quadTree.Size * 0.5f - tileSize * 0.5f;
+                GenerateMSTile(quadTree, 1, tileXPos, tileYPos, tileSize, meshData);
+
+            }
+        }
+
+        meshData.SetMesh(MeshFilter.mesh, "MarchingSquaresMesh");
+    }
+
+    public void GenerateMSTile(QuadTree quadTree, int tileIndex, float x, float y, float tileSize, MeshData meshData) {
+//        if (tileIndex == 0) return;
+
+        // draw whole texture
+        float rootSize = quadTree.Root.Size + tileSize;
+        float rootSizeHalf = rootSize * 0.5f;
+        float u = x / rootSize - 0.5f;
+        float v = y / rootSize - 0.5f;
+        float quadSize = tileSize / rootSize;
+        Vector2[] uvs = new Vector2[] {
+            new Vector2(u, v),
+            new Vector2(u + quadSize, v),
+            new Vector2(u, v + quadSize),
+            new Vector2(u + quadSize, v + quadSize),
+        };
+        
+        meshData.AddQuad(x, y, tileSize, uvs);
+    }
+
     public void GenerateQuadTreeMesh(QuadTree quadTree, int depth = 0, MeshData meshData = null) {
 
         if (meshData == null) {

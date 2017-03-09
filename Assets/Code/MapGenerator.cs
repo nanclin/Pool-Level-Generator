@@ -171,9 +171,33 @@ public class MapGenerator : MonoBehaviour {
 
         QuadTree = new QuadTree(fillPixels, 0, 0, Size, MaxDepth, 4);
 
+
+//        int size = (int) Size;
+//        QuadTree = new QuadTree(new List<Cell>() {
+//            new Cell(2, 2, size, 999),
+//
+//            //            new Cell((int) (Random.value * size), (int) (Random.value * size), size, 999),
+//            //            new Cell((int) (Random.value * size), (int) (Random.value * size), size, 999),
+//            //            new Cell((int) (Random.value * size), (int) (Random.value * size), size, 999),
+//
+//            //            new Cell((int) (Random.value * size), (int) (Random.value * size), 999),
+//            //            new Cell((int) (Random.value * size), (int) (Random.value * size), 999),
+//            //            new Cell((int) (Random.value * size), (int) (Random.value * size), 999),
+//            //
+//            //            new Cell((int) (Random.value * size), (int) (Random.value * size), 999),
+//            //            new Cell((int) (Random.value * size), (int) (Random.value * size), 999),
+//            //            new Cell((int) (Random.value * size), (int) (Random.value * size), 999),
+//        }, 0, 0, size, MaxDepth);
+//
         Debug.Log(string.Format("{0}", QuadTree));
 
-        MeshGenerator.GenerateQuadTreeMesh(QuadTree);
+
+//        DebugMapRenderer.RenderColourMap(DebugMap);
+//
+        MeshGenerator.GenerateMarchingSquaresMesh(QuadTree);
+//        MeshGenerator.GenerateQuadTreeMesh(QuadTree);
+
+//        Debug.Log(string.Format("value at 3,3={0}", QuadTree.ValueAtPosition(3, 3)));
     }
 
     private void DrawOutlinesGizmos(List<List<Cell>> outlines) {
