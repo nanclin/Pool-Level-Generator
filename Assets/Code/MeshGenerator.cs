@@ -47,6 +47,7 @@ public class MeshGenerator : MonoBehaviour {
 //                Debug.Log(string.Format("x={0} y={1}", x, y));
 
                 int tileIndex = 0;
+                float[] cornerWeights = new float[4];
 
                 for (int i = 0; i < 4; i++) {
                     int ix = x + CornerIndices[i, 0];
@@ -81,11 +82,13 @@ public class MeshGenerator : MonoBehaviour {
                     if (value == 1) {
                         tileIndex += (int) Mathf.Pow(2, i);
                     }
+
+                    cornerWeights[i] = p;
                 }
 
                 float tileXPos = x * tileSize - quadTree.Size * 0.5f - tileSize * 0.5f;
                 float tileYPos = y * tileSize - quadTree.Size * 0.5f - tileSize * 0.5f;
-                GenerateMSTile(quadTree, tileIndex, tileXPos, tileYPos, tileSize, meshData);
+                GenerateMSTile(quadTree, tileIndex, cornerWeights, tileXPos, tileYPos, tileSize, meshData);
 
             }
         }
@@ -93,7 +96,7 @@ public class MeshGenerator : MonoBehaviour {
         meshData.SetMesh(MeshFilter.mesh, "MarchingSquaresMesh");
     }
 
-    public void GenerateMSTile(QuadTree quadTree, int tileIndex, float x, float y, float tileSize, MeshData meshData) {
+    public void GenerateMSTile(QuadTree quadTree, int tileIndex, float[] cornerWeights, float x, float y, float tileSize, MeshData meshData) {
         if (tileIndex == 0) return;
 
         float rootSize = quadTree.Root.Size + tileSize;
@@ -111,18 +114,38 @@ public class MeshGenerator : MonoBehaviour {
         Vector3 cUV = new Vector2(u, v + quadSize);
         Vector3 dUV = new Vector2(u + quadSize, v + quadSize);
 
-        float tileSizeHalf = tileSize * 0.5f;
-        float quadSizeHalf = quadSize * 0.5f;
+        float aW = cornerWeights[0];
+        float bW = cornerWeights[1];
+        float cW = cornerWeights[3];
+        float dW = cornerWeights[2];
 
-        Vector3 s = new Vector2(x + tileSizeHalf, y);
-        Vector3 n = new Vector2(x + tileSizeHalf, y + tileSize);
-        Vector3 w = new Vector2(x, y + tileSizeHalf);
-        Vector3 e = new Vector2(x + tileSize, y + tileSizeHalf);
+        float sEdgeNormal = GetEdgeInterpolation(aW, bW, PerlinTreshold);
+        float nEdgeNormal = GetEdgeInterpolation(cW, dW, PerlinTreshold);
+        float wEdgeNormal = GetEdgeInterpolation(aW, cW, PerlinTreshold);
+        float eEdgeNormal = GetEdgeInterpolation(bW, dW, PerlinTreshold);
 
-        Vector3 sUV = new Vector2(u + quadSizeHalf, v);
-        Vector3 nUV = new Vector2(u + quadSizeHalf, v + quadSize);
-        Vector3 wUV = new Vector2(u, v + quadSizeHalf);
-        Vector3 eUV = new Vector2(u + quadSize, v + quadSizeHalf);
+//        float tileSizeHalf = tileSize * 0.5f;
+//        float quadSizeHalf = quadSize * 0.5f;
+
+        float sTileEdgeOffset = tileSize * sEdgeNormal;
+        float nTileEdgeOffset = tileSize * nEdgeNormal;
+        float wTileEdgeOffset = tileSize * wEdgeNormal;
+        float eTileEdgeOffset = tileSize * eEdgeNormal;
+
+        float sQuadEdgeOffset = quadSize * sEdgeNormal;
+        float nQuadEdgeOffset = quadSize * nEdgeNormal;
+        float wQuadEdgeOffset = quadSize * wEdgeNormal;
+        float eQuadEdgeOffset = quadSize * eEdgeNormal;
+
+        Vector3 s = new Vector2(x + sTileEdgeOffset, y);
+        Vector3 n = new Vector2(x + nTileEdgeOffset, y + tileSize);
+        Vector3 w = new Vector2(x, y + wTileEdgeOffset);
+        Vector3 e = new Vector2(x + tileSize, y + eTileEdgeOffset);
+
+        Vector3 sUV = new Vector2(u + sQuadEdgeOffset, v);
+        Vector3 nUV = new Vector2(u + nQuadEdgeOffset, v + quadSize);
+        Vector3 wUV = new Vector2(u, v + wQuadEdgeOffset);
+        Vector3 eUV = new Vector2(u + quadSize, v + eQuadEdgeOffset);
 
         switch (tileIndex) {
             case 1:
@@ -151,8 +174,7 @@ public class MeshGenerator : MonoBehaviour {
             case 7:
                 meshData.AddTriangle(a, w, n, new Vector2[]{ aUV, wUV, nUV });
                 meshData.AddTriangle(a, n, d, new Vector2[]{ aUV, nUV, dUV });
-                meshData.AddTriangle(a, d, e, new Vector2[]{ aUV, dUV, eUV });
-                meshData.AddTriangle(a, e, b, new Vector2[]{ aUV, eUV, bUV });
+                meshData.AddTriangle(a, d, b, new Vector2[]{ aUV, dUV, bUV });
                 break;
             case 8:
                 meshData.AddTriangle(w, c, n, new Vector2[]{ wUV, cUV, nUV });
@@ -193,7 +215,11 @@ public class MeshGenerator : MonoBehaviour {
         }
     }
 
-    //    private void AddMarchingSquaresTileTriangles(int tileIndex){
+    private float GetEdgeInterpolation(float a, float b, float treshold) {
+        float k = b - a;
+        float x = treshold;
+        return (x - a) / k;
+    }
 
     public void GenerateQuadTreeMesh(QuadTree quadTree, int depth = 0, MeshData meshData = null) {
 
