@@ -4,8 +4,10 @@ using System.Collections;
 public class MapRenderer : MonoBehaviour {
 
     [SerializeField] private Renderer Renderer;
+    [SerializeField] private Color Color1;
+    [SerializeField] private Color Color0;
 
-    public void RenderBitMap(int[,] map) {
+    public void RenderBitMap(float[,] map, float treshold = 0.5f) {
         int width = map.GetLength(0);
         int height = map.GetLength(1);
 
@@ -14,7 +16,7 @@ public class MapRenderer : MonoBehaviour {
         Color[] colourMap = new Color[width * height];
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                colourMap[y * width + x] = (map[x, y] == 1) ? Color.clear : Color.black;
+                colourMap[y * width + x] = Color.Lerp(Color0, Color1, map[x, y] > treshold ? 1f : 0f);
             }
         }
 

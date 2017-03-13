@@ -26,6 +26,10 @@ public class MapGenerator : MonoBehaviour {
     [SerializeField] public int MaxDepth = 5;
     [Range(1, 10)][SerializeField] public int OutlineDetail = 1;
 
+    [Header("Perlin Noise")]
+    [SerializeField] private float PerlinScale = 0.45f;
+    [Range(0, 1)] [SerializeField] private float PerlinTreshold = 0.5f;
+
     private List<List<Cell>> Outlines;
     private Color[,] DebugMap;
     private HashSet<int> Visited;
@@ -48,6 +52,37 @@ public class MapGenerator : MonoBehaviour {
         }
         return map;
     }
+
+    public float[,] GenerateValueMapFromImage(Texture2D inputImage) {
+        float[,] map = new float[Size, Size];
+
+        for (int y = 0; y < Size; y++) {
+            for (int x = 0; x < Size; x++) {
+                
+                if (x == 0 || x == Size - 1 || y == 0 || y == Size - 1) {
+                    map[x, y] = 0f;
+                    continue;
+                }
+
+//                map[x, y] = inputImage.GetPixel(x, y).grayscale > Treshold ? 1f : 0f;
+                map[x, y] = inputImage.GetPixel(x, y).grayscale;
+            }
+        }
+        return map;
+    }
+
+    public float[,] GenerateValueMapFromPerlinNoise() {
+        float[,] map = new float[Size, Size];
+
+        for (int y = 0; y < Size; y++) {
+            for (int x = 0; x < Size; x++) {
+                
+                map[x, y] = Mathf.PerlinNoise(x * PerlinScale, y * PerlinScale);
+            }
+        }
+        return map;
+    }
+
 
     private List<List<Cell>> FindAllOutlines(int[,] map) {
 
@@ -146,11 +181,16 @@ public class MapGenerator : MonoBehaviour {
     }
 
     public void RenderMap() {
+
+        float[,] map = GenerateValueMapFromPerlinNoise();
+//        float[,] map = GenerateValueMapFromImage(InputImage);
+        ImageMapRenderer.RenderBitMap(map, PerlinTreshold);
+        MeshGenerator.GenerateMarchingSquaresMesh(map, PerlinTreshold, MaxDepth);
+
 //        MeshGenerator.GenerateMesh();
 //        return;
-
-        int[,] map = GenerateMapFromImage(InputImage);
-        ImageMapRenderer.RenderBitMap(map);
+//
+//        ImageMapRenderer.RenderBitMap(map);
 
 //        Outlines = FindAllOutlines(map);
 //
@@ -161,15 +201,15 @@ public class MapGenerator : MonoBehaviour {
 //            }
 //        }
 
-        List<Cell> fillPixels = new List<Cell>();
-        for (int y = 0; y < Size; y++) {
-            for (int x = 0; x < Size; x++) {
-                if (map[x, y] == 0)
-                    fillPixels.Add(new Cell(x, y, Size, 0));
-            }
-        }
-
-        QuadTree = new QuadTree(fillPixels, 0, 0, Size, MaxDepth, 4);
+//        List<Cell> fillPixels = new List<Cell>();
+//        for (int y = 0; y < Size; y++) {
+//            for (int x = 0; x < Size; x++) {
+//                if (map[x, y] == 0)
+//                    fillPixels.Add(new Cell(x, y, Size, 0));
+//            }
+//        }
+//
+//        QuadTree = new QuadTree(fillPixels, 0, 0, Size, MaxDepth, 4);
 
 
 //        int size = (int) Size;
@@ -189,12 +229,11 @@ public class MapGenerator : MonoBehaviour {
 //            //            new Cell((int) (Random.value * size), (int) (Random.value * size), 999),
 //        }, 0, 0, size, MaxDepth);
 //
-        Debug.Log(string.Format("{0}", QuadTree));
+//        Debug.Log(string.Format("{0}", QuadTree));
 
 
 //        DebugMapRenderer.RenderColourMap(DebugMap);
-//
-        MeshGenerator.GenerateMarchingSquaresMesh(QuadTree);
+
 //        MeshGenerator.GenerateQuadTreeMesh(QuadTree);
 
 //        Debug.Log(string.Format("value at 3,3={0}", QuadTree.ValueAtPosition(3, 3)));

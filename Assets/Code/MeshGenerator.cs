@@ -5,9 +5,7 @@ public class MeshGenerator : MonoBehaviour {
 
     [SerializeField] private MeshFilter MeshFilter;
     [SerializeField] private MeshRenderer MeshRenderer;
-    [SerializeField] private float PerlinScale = 1;
-    [SerializeField] private Vector2 PerlinOffset;
-    [SerializeField] private float PerlinTreshold = 0.5f;
+    [Range(0, 1)][SerializeField] private float InterpolatePower = 1;
 
     private  int[,] CornerIndices = {
         { 0, 0 },
@@ -39,6 +37,7 @@ public class MeshGenerator : MonoBehaviour {
         MeshData meshData = new MeshData();
 
         float tileSize = quadTree.Size / quadTree.CellsPerSide;
+        float rootSize = quadTree.Root.Size + tileSize;
 
         int cells = quadTree.CellsPerSide;
 
@@ -75,20 +74,20 @@ public class MeshGenerator : MonoBehaviour {
 //                        tileIndex += (int) Mathf.Pow(2, i);
 //                    }
 
-                    float p = Mathf.PerlinNoise(ix * PerlinScale, iy * PerlinScale);
-                    int value = p > PerlinTreshold ? 1 : 0;
-//                    Debug.Log(string.Format("x={0}, y={1} | ix={2} iy={3} p={4}", x, y, ix, iy, p));
+//                    float p = Mathf.PerlinNoise(ix * PerlinScale, iy * PerlinScale);
+//                    int value = p > PerlinTreshold ? 1 : 0;
+////                    Debug.Log(string.Format("x={0}, y={1} | ix={2} iy={3} p={4}", x, y, ix, iy, p));
+//
+//                    if (value == 1) {
+//                        tileIndex += (int) Mathf.Pow(2, i);
+//                    }
 
-                    if (value == 1) {
-                        tileIndex += (int) Mathf.Pow(2, i);
-                    }
-
-                    cornerWeights[i] = p;
+//                    cornerWeights[i] = p;
                 }
 
-                float tileXPos = x * tileSize - quadTree.Size * 0.5f - tileSize * 0.5f;
-                float tileYPos = y * tileSize - quadTree.Size * 0.5f - tileSize * 0.5f;
-                GenerateMSTile(quadTree, tileIndex, cornerWeights, tileXPos, tileYPos, tileSize, meshData);
+//                float tileXPos = x * tileSize - quadTree.Size * 0.5f - tileSize * 0.5f;
+//                float tileYPos = y * tileSize - quadTree.Size * 0.5f - tileSize * 0.5f;
+//                GenerateMSTile(rootSize, tileIndex, cornerWeights, tileXPos, tileYPos, tileSize, meshData);
 
             }
         }
@@ -96,13 +95,52 @@ public class MeshGenerator : MonoBehaviour {
         meshData.SetMesh(MeshFilter.mesh, "MarchingSquaresMesh");
     }
 
-    public void GenerateMSTile(QuadTree quadTree, int tileIndex, float[] cornerWeights, float x, float y, float tileSize, MeshData meshData) {
+    public void GenerateMarchingSquaresMesh(float[,] map, float treshold = 0.5f, float depth = 3) {
+
+        MeshData meshData = new MeshData();
+
+        int width = map.GetLength(0);
+        int height = map.GetLength(1);
+        float tileSize = 1;
+
+        for (int y = 0; y < width + 1; y++) {
+            for (int x = 0; x < height + 1; x++) {
+
+                int tileIndex = 0;
+                float[] cornerWeights = new float[4];
+
+                for (int i = 0; i < 4; i++) {
+
+                    int ix = x + CornerIndices[i, 0];
+                    int iy = y + CornerIndices[i, 1];
+
+                    if (ix >= width) continue;
+                    if (iy >= height) continue;
+
+                    int value = map[ix, iy] > treshold ? 1 : 0;
+
+                    if (value == 1) {
+                        tileIndex += (int) Mathf.Pow(2, i);
+                    }
+
+                    cornerWeights[i] = map[ix, iy];
+                }
+
+                float tileXPos = x * tileSize - width * 0.5f + tileSize * 0.5f;
+                float tileYPos = y * tileSize - height * 0.5f + tileSize * 0.5f;
+                GenerateMSTile(tileXPos, tileYPos, (float) width, tileSize, tileIndex, treshold, cornerWeights, meshData);
+            }
+        }
+
+        meshData.SetMesh(MeshFilter.mesh, "MarchingSquaresMesh");
+    }
+
+    public void GenerateMSTile(float x, float y, float gridSize, float tileSize, int tileIndex, float treshold, float[] cornerWeights, MeshData meshData) {
         if (tileIndex == 0) return;
 
-        float rootSize = quadTree.Root.Size + tileSize;
-        float u = x / rootSize - 0.5f;
-        float v = y / rootSize - 0.5f;
-        float quadSize = tileSize / rootSize;
+        float u = x / gridSize - 0.5f;
+        float v = y / gridSize - 0.5f;
+        float quadSize = tileSize / gridSize;
 
         Vector3 a = new Vector2(x, y);
         Vector3 b = new Vector2(x + tileSize, y);
@@ -119,10 +157,10 @@ public class MeshGenerator : MonoBehaviour {
         float cW = cornerWeights[3];
         float dW = cornerWeights[2];
 
-        float sEdgeNormal = GetEdgeInterpolation(aW, bW, PerlinTreshold);
-        float nEdgeNormal = GetEdgeInterpolation(cW, dW, PerlinTreshold);
-        float wEdgeNormal = GetEdgeInterpolation(aW, cW, PerlinTreshold);
-        float eEdgeNormal = GetEdgeInterpolation(bW, dW, PerlinTreshold);
+        float sEdgeNormal = Mathf.Lerp(0.5f, GetEdgeInterpolation(aW, bW, treshold), InterpolatePower);
+        float nEdgeNormal = Mathf.Lerp(0.5f, GetEdgeInterpolation(cW, dW, treshold), InterpolatePower);
+        float wEdgeNormal = Mathf.Lerp(0.5f, GetEdgeInterpolation(aW, cW, treshold), InterpolatePower);
+        float eEdgeNormal = Mathf.Lerp(0.5f, GetEdgeInterpolation(bW, dW, treshold), InterpolatePower);
 
 //        float tileSizeHalf = tileSize * 0.5f;
 //        float quadSizeHalf = quadSize * 0.5f;
