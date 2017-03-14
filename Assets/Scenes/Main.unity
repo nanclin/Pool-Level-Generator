@@ -340,7 +340,8 @@ MonoBehaviour:
   AutoUpdateGizmos: 1
   DrawOutlines: 0
   DrawQuadTree: 0
-  MaxDepth: 6
+  DrawLinkedQuadTree: 1
+  MaxDepth: 7
   OutlineDetail: 1
   PerlinScale: 0.08
   PerlinTreshold: 0.45

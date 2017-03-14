@@ -23,6 +23,7 @@ public class MapGenerator : MonoBehaviour {
     [SerializeField] public bool AutoUpdateGizmos;
     [SerializeField] public bool DrawOutlines;
     [SerializeField] public bool DrawQuadTree;
+    [SerializeField] public bool DrawLinkedQuadTree;
     [SerializeField] public int MaxDepth = 5;
     [Range(1, 10)][SerializeField] public int OutlineDetail = 1;
 
@@ -34,6 +35,7 @@ public class MapGenerator : MonoBehaviour {
     private Color[,] DebugMap;
     private HashSet<int> Visited;
     private QuadTree QuadTree;
+    private LinkedQuadTree LinkedQuadTree;
 
     public int[,] GenerateMapFromImage(Texture2D inputImage) {
         int[,] map = new int[Size, Size];
@@ -182,10 +184,13 @@ public class MapGenerator : MonoBehaviour {
 
     public void RenderMap() {
 
+        LinkedQuadTree = new LinkedQuadTree(-Vector2.one * Size / 2, Size, MaxDepth);
+//        foreach (Node node in LinkedQuadTree.Nodes) Debug.Log(node);
+
         float[,] map = GenerateValueMapFromPerlinNoise();
-//        float[,] map = GenerateValueMapFromImage(InputImage);
+////        float[,] map = GenerateValueMapFromImage(InputImage);
         ImageMapRenderer.RenderBitMap(map, PerlinTreshold);
-        MeshGenerator.GenerateMarchingSquaresMesh(map, PerlinTreshold, MaxDepth);
+//        MeshGenerator.GenerateMarchingSquaresMesh(map, PerlinTreshold, MaxDepth);
 
 //        MeshGenerator.GenerateMesh();
 //        return;
@@ -268,6 +273,11 @@ public class MapGenerator : MonoBehaviour {
         if (QuadTree != null) {
             if (DrawQuadTree)
                 QuadTree.DrawQuadTreeGizmos(Size);
+        }
+
+        if (LinkedQuadTree != null) {
+            if (DrawLinkedQuadTree)
+                LinkedQuadTree.DrawGizmos();
         }
     }
 }
