@@ -185,7 +185,16 @@ public class MapGenerator : MonoBehaviour {
     public void RenderMap() {
 
         LinkedQuadTree = new LinkedQuadTree(-Vector2.one * Size / 2, Size, MaxDepth);
-        foreach (LinkedQuadTreeNode node in LinkedQuadTree.GetLeafNodes()) Debug.Log(node);
+
+//        LinkedQuadTreeNode lastNode = LinkedQuadTree.Nodes[LinkedQuadTree.Nodes.Length - 5];
+        LinkedQuadTree.InsertValue(1, LinkedQuadTree.Nodes[LinkedQuadTree.Nodes.Length - 1]);
+        LinkedQuadTree.InsertValue(1, LinkedQuadTree.Nodes[LinkedQuadTree.Nodes.Length - 2]);
+        LinkedQuadTree.InsertValue(1, LinkedQuadTree.Nodes[LinkedQuadTree.Nodes.Length - 3]);
+        LinkedQuadTree.InsertValue(1, LinkedQuadTree.Nodes[LinkedQuadTree.Nodes.Length - 4]);
+
+        foreach (LinkedQuadTreeNode node in LinkedQuadTree.Nodes) Debug.Log(node);
+//        foreach (LinkedQuadTreeNode node in LinkedQuadTree.GetParentNodes(lastNode)) Debug.Log(node);
+//        foreach (LinkedQuadTreeNode node in LinkedQuadTree.GetLeafNodes()) Debug.Log(node);
 
         float[,] map = GenerateValueMapFromPerlinNoise();
 ////        float[,] map = GenerateValueMapFromImage(InputImage);

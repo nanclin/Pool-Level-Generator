@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public class LinkedQuadTree {
 
@@ -42,6 +43,10 @@ public class LinkedQuadTree {
         BuildQuadTreeRecursively(position4, sizeHalf, height, depth + 1, nextIndex + 4, nodes);
     }
 
+    public bool IsLeaf(LinkedQuadTreeNode node) {
+        return node.Depth + 1 == Height;
+    }
+
     public IEnumerable<LinkedQuadTreeNode> GetLeafNodes() {
 
         int leafNodes = (int) Mathf.Pow(4, Height - 1);
@@ -51,6 +56,39 @@ public class LinkedQuadTree {
             yield return Nodes[i];
         }
     }
+
+    public void InsertValue(int value, LinkedQuadTreeNode node) {
+
+        Assert.IsTrue(IsLeaf(node), "Value can be inserted only on leaf node!");
+
+        node.Value = value;
+
+        foreach (LinkedQuadTreeNode n in GetAllParentNodes(node)) {
+            n.Value += value;
+        }
+    }
+
+    public LinkedQuadTreeNode[] GetAllParentNodes(LinkedQuadTreeNode node, LinkedQuadTreeNode[] parentNodes = null) {
+
+        if (parentNodes == null) {
+            parentNodes = new LinkedQuadTreeNode[node.Depth];
+        }
+
+        if (node.Depth > 0) {
+            LinkedQuadTreeNode parentNode = GetParentNode(node);
+            parentNodes[node.Depth - 1] = parentNode;
+            return GetAllParentNodes(parentNode, parentNodes);
+        }
+
+        return parentNodes;
+    }
+
+    public LinkedQuadTreeNode GetParentNode(LinkedQuadTreeNode node) {
+        int parentIndex = Mathf.FloorToInt((node.Index - 1) / 4);
+        return Nodes[parentIndex];
+    }
+
+#region Gizmos
 
     public void DrawQuadTreeGizmo() {
 
@@ -84,6 +122,8 @@ public class LinkedQuadTree {
         Debug.DrawLine(d, c, color);
         Debug.DrawLine(c, a, color);
     }
+
+#endregion
 }
 
 public class LinkedQuadTreeNode {
@@ -92,15 +132,17 @@ public class LinkedQuadTreeNode {
     public readonly float Size;
     public readonly int Depth;
     public readonly int Index;
+    public int Value;
 
-    public LinkedQuadTreeNode(Vector2 position, float size, int depth, int index) {
+    public LinkedQuadTreeNode(Vector2 position, float size, int depth, int index, int value = 0) {
         Position = position;
         Size = size;
         Depth = depth;
         Index = index;
+        Value = value;
     }
 
     public override string ToString() {
-        return string.Format("[Node] position={0}, size={1}, depth={2}, index={3}", Position, Size, Depth, Index);
+        return string.Format("[Node] position={0}, size={1}, depth={2}, index={3}, value={4}", Position, Size, Depth, Index, Value);
     }
 }
