@@ -185,7 +185,7 @@ public class MapGenerator : MonoBehaviour {
     public void RenderMap() {
 
         LinkedQuadTree = new LinkedQuadTree(-Vector2.one * Size / 2, Size, MaxDepth);
-//        foreach (Node node in LinkedQuadTree.Nodes) Debug.Log(node);
+        foreach (LinkedQuadTreeNode node in LinkedQuadTree.GetLeafNodes()) Debug.Log(node);
 
         float[,] map = GenerateValueMapFromPerlinNoise();
 ////        float[,] map = GenerateValueMapFromImage(InputImage);

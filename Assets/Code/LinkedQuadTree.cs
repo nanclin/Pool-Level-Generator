@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class LinkedQuadTree {
 
@@ -40,6 +40,16 @@ public class LinkedQuadTree {
         BuildQuadTreeRecursively(position2, sizeHalf, height, depth + 1, nextIndex + 2, nodes);
         BuildQuadTreeRecursively(position3, sizeHalf, height, depth + 1, nextIndex + 3, nodes);
         BuildQuadTreeRecursively(position4, sizeHalf, height, depth + 1, nextIndex + 4, nodes);
+    }
+
+    public IEnumerable<LinkedQuadTreeNode> GetLeafNodes() {
+
+        int leafNodes = (int) Mathf.Pow(4, Height - 1);
+        int startIndex = Nodes.Length - leafNodes;
+
+        for (int i = startIndex; i < Nodes.Length; ++i) {
+            yield return Nodes[i];
+        }
     }
 
     public void DrawGizmos() {
