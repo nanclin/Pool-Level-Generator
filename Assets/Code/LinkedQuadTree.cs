@@ -52,25 +52,37 @@ public class LinkedQuadTree {
         }
     }
 
-    public void DrawGizmos() {
+    public void DrawQuadTreeGizmo() {
 
         for (int i = Nodes.Length - 1; i >= 0; i--) {
+
             LinkedQuadTreeNode node = Nodes[i];
 
-            Vector2 position = node.Position;
-            float size = node.Size;
-            Color colorFade = Color.Lerp(Color.black, Color.white, 1f - ((float) node.Depth / (float) Height));
+            Color color = Color.Lerp(Color.black, Color.white, 1f - ((float) node.Depth / (float) Height));
 
-            Vector2 a = position;
-            Vector2 b = position + Vector2.right * size;
-            Vector2 c = position + Vector2.up * size;
-            Vector2 d = position + Vector2.one * size;
-
-            Debug.DrawLine(a, b, colorFade);
-            Debug.DrawLine(b, d, colorFade);
-            Debug.DrawLine(d, c, colorFade);
-            Debug.DrawLine(c, a, colorFade);
+            DrawNodeGizmo(node, color);
         }
+    }
+
+    public void DrawLeafNodesGizmo() {
+        foreach (LinkedQuadTreeNode node in GetLeafNodes()) {
+            DrawNodeGizmo(node, Color.white);
+        }
+    }
+
+    public void DrawNodeGizmo(LinkedQuadTreeNode node, Color color) {
+        Vector2 position = node.Position;
+        float size = node.Size;
+
+        Vector2 a = position;
+        Vector2 b = position + Vector2.right * size;
+        Vector2 c = position + Vector2.up * size;
+        Vector2 d = position + Vector2.one * size;
+
+        Debug.DrawLine(a, b, color);
+        Debug.DrawLine(b, d, color);
+        Debug.DrawLine(d, c, color);
+        Debug.DrawLine(c, a, color);
     }
 }
 

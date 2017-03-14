@@ -276,8 +276,10 @@ public class MapGenerator : MonoBehaviour {
         }
 
         if (LinkedQuadTree != null) {
-            if (DrawLinkedQuadTree)
-                LinkedQuadTree.DrawGizmos();
+            if (DrawLinkedQuadTree) {
+//                LinkedQuadTree.DrawGizmos();
+                LinkedQuadTree.DrawLeafNodesGizmo();
+            }
         }
     }
 }
