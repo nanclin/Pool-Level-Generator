@@ -59,6 +59,10 @@ public class LinkedQuadTree {
         return (int) Mathf.Pow(4, Height - 1 - node.Depth);
     }
 
+    public float NormalizedValue(LinkedQuadTreeNode node) {
+        return (float) node.Value / NumberOfCells(node);
+    }
+
     public IEnumerable<LinkedQuadTreeNode> GetLeafNodes() {
 
         int leafNodes = (int) Mathf.Pow(4, Height - 1);

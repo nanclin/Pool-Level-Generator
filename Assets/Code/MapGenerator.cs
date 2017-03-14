@@ -198,6 +198,10 @@ public class MapGenerator : MonoBehaviour {
         Debug.Log(string.Format(" ...Nodes[0] IsEmpty()={0}", LinkedQuadTree.IsEmpty(LinkedQuadTree.Nodes[0])));
         Debug.Log(string.Format(" ...Nodes[1] IsEmpty()={0}", LinkedQuadTree.IsEmpty(LinkedQuadTree.Nodes[1])));
 
+        Debug.Log(string.Format(" ...Nodes[4] NormalizedValue()={0}", LinkedQuadTree.NormalizedValue(LinkedQuadTree.Nodes[4])));
+        Debug.Log(string.Format(" ...Nodes[0] NormalizedValue()={0}", LinkedQuadTree.NormalizedValue(LinkedQuadTree.Nodes[0])));
+        Debug.Log(string.Format(" ...Nodes[20] NormalizedValue()={0}", LinkedQuadTree.NormalizedValue(LinkedQuadTree.Nodes[20])));
+
         foreach (LinkedQuadTreeNode node in LinkedQuadTree.Nodes) Debug.Log(node);
 //        foreach (LinkedQuadTreeNode node in LinkedQuadTree.GetParentNodes(lastNode)) Debug.Log(node);
 //        foreach (LinkedQuadTreeNode node in LinkedQuadTree.GetLeafNodes()) Debug.Log(node);
