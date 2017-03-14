@@ -48,11 +48,15 @@ public class LinkedQuadTree {
     }
 
     public bool IsFull(LinkedQuadTreeNode node) {
-        return node.Value == Mathf.Pow(4, Height - 1 - node.Depth);
+        return node.Value == NumberOfCells(node);
     }
 
     public bool IsEmpty(LinkedQuadTreeNode node) {
         return node.Value == 0;
+    }
+
+    public int NumberOfCells(LinkedQuadTreeNode node) {
+        return (int) Mathf.Pow(4, Height - 1 - node.Depth);
     }
 
     public IEnumerable<LinkedQuadTreeNode> GetLeafNodes() {
