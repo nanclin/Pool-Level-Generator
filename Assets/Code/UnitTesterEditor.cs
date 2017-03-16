@@ -13,6 +13,8 @@ public class UnitTesterEditor : Editor {
 
         if (GUILayout.Button("RunTests")) {
             Success = RunTests();
+            string message = Success ? "All tests passed!" : "Some tests failed! Look at the console.";
+            EditorUtility.DisplayDialog("Tests run", message, "OK");
         }
 
         GUIStyle style = new GUIStyle();
