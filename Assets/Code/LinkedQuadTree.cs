@@ -52,7 +52,7 @@ public class LinkedQuadTree {
     }
 
     public bool IsEmpty(LinkedQuadTreeNode node) {
-        return node.Value == 0;
+        return node.Value < NumberOfCells(node);
     }
 
     public int NumberOfCells(LinkedQuadTreeNode node) {
