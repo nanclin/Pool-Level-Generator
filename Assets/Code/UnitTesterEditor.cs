@@ -60,7 +60,7 @@ public class UnitTesterEditor : Editor {
         TestAssert(linkedQuadTree.IsFull(linkedQuadTree.Nodes[4]) == true, "Expected cell 4 to be full!", ref success, ref messages);
         TestAssert(linkedQuadTree.IsFull(linkedQuadTree.Nodes[0]) == false, "Expected cell 0 not to be full!", ref success, ref messages);
         TestAssert(linkedQuadTree.IsEmpty(linkedQuadTree.Nodes[4]) == false, "Expected cell 4 not to be empty!", ref success, ref messages);
-        TestAssert(linkedQuadTree.IsEmpty(linkedQuadTree.Nodes[0]) == true, "Expected cell 0 to be empty!", ref success, ref messages);
+        TestAssert(linkedQuadTree.IsEmpty(linkedQuadTree.Nodes[0]) == false, "Expected cell 0 to be empty!", ref success, ref messages);
         TestAssert(linkedQuadTree.IsEmpty(linkedQuadTree.Nodes[1]) == true, "Expected cell 1 to be emtpy!", ref success, ref messages);
 
         return success;
