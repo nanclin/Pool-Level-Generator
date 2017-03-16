@@ -1,7 +1,5 @@
 ﻿using UnityEditor;
 using UnityEngine;
-using UnityEngine.Assertions;
-using System;
 
 [CustomEditor(typeof(UnitTester))]
 public class UnitTesterEditor : Editor {
@@ -29,6 +27,7 @@ public class UnitTesterEditor : Editor {
         success &= TestEmptyAndFull();
         success &= TestNormalizedValue();
         success &= TestGetAllParentNodes();
+        success &= TestNumberOfCells();
 
         return success;
     }
@@ -102,6 +101,27 @@ public class UnitTesterEditor : Editor {
         TestAssert(parentNodes.Length == 2, "Expected 2 parent nodes!", ref success, ref messages);
         TestAssert(parentNodes[0].Index == 0, "Expected top parent to be root!", ref success, ref messages);
         TestAssert(parentNodes[1].Index == 4, "Expected second parent have index 4!", ref success, ref messages);
+
+        return success;
+    }
+
+    private bool TestNumberOfCells() {
+        bool success = true;
+        string messages = "";
+
+        int size = 128;
+        int height = 3;
+
+        LinkedQuadTree linkedQuadTree = new LinkedQuadTree(new Vector2(-size / 2, -size / 2), size, height);
+        LinkedQuadTreeNode lastNode = linkedQuadTree.Nodes[linkedQuadTree.Nodes.Length - 1];
+
+        TestAssert(linkedQuadTree.NumberOfCells(linkedQuadTree.Nodes[0]) == 16, "Expected 4 cells at this depth!", ref success, ref messages);
+        TestAssert(linkedQuadTree.NumberOfCells(linkedQuadTree.Nodes[1]) == 4, "Expected 2 cells at this depth!", ref success, ref messages);
+        TestAssert(linkedQuadTree.NumberOfCells(lastNode) == 1, "Expected 1 cell at this depth!", ref success, ref messages);
+
+        TestAssert(linkedQuadTree.NumberOfCellsPerSide(linkedQuadTree.Nodes[0]) == 4, "Expected 4 cells at this depth!", ref success, ref messages);
+        TestAssert(linkedQuadTree.NumberOfCellsPerSide(linkedQuadTree.Nodes[1]) == 2, "Expected 2 cells at this depth!", ref success, ref messages);
+        TestAssert(linkedQuadTree.NumberOfCellsPerSide(lastNode) == 1, "Expected 1 cell at this depth!", ref success, ref messages);
 
         return success;
     }
