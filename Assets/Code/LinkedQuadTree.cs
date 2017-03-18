@@ -7,6 +7,8 @@ public class LinkedQuadTree {
     public readonly LinkedQuadTreeNode[] Nodes;
     public readonly int Height;
 
+    private LinkedQuadTreeNode[] LeafNodes;
+
     public LinkedQuadTree(Vector2 position, float size, int height, int depth = 0, int index = 0) {
 
         if (depth == 0) {
@@ -67,14 +69,19 @@ public class LinkedQuadTree {
         return (float) node.Value / NumberOfCells(node);
     }
 
-    public IEnumerable<LinkedQuadTreeNode> GetLeafNodes() {
+    public LinkedQuadTreeNode[] GetLeafNodes() {
 
-        int leafNodes = (int) Mathf.Pow(4, Height - 1);
-        int startIndex = Nodes.Length - leafNodes;
+        if (LeafNodes != null) return LeafNodes;
 
-        for (int i = startIndex; i < Nodes.Length; ++i) {
-            yield return Nodes[i];
+        int leafNodesCount = (int) Mathf.Pow(4, Height - 1);
+        int startIndex = Nodes.Length - leafNodesCount;
+
+        LeafNodes = new LinkedQuadTreeNode[leafNodesCount];
+        for (int i = 0; i < leafNodesCount; i++) {
+            LeafNodes[i] = Nodes[startIndex + i];
         }
+
+        return LeafNodes;
     }
 
     public void InsertValue(int value, LinkedQuadTreeNode node) {
