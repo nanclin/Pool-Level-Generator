@@ -91,6 +91,41 @@ public class LinkedQuadTree {
         }
     }
 
+    public void InsertValuesFromMap(int[,] map) {
+
+        int width = map.GetLength(0);
+        int height = map.GetLength(1);
+        int treeSize = NumberOfCells(Nodes[0]);
+        int mapSize = width;
+
+        Assert.IsTrue(width == height, "It must be a square map!");
+        Assert.IsTrue(Mathf.IsPowerOfTwo(mapSize), "It must be a power of two map");
+
+        int subCellsPerSide = (int) Mathf.Sqrt(mapSize / treeSize);
+
+        LinkedQuadTreeNode[] leafNodes = GetLeafNodes();
+
+        // loop through quad tree cells
+        foreach (LinkedQuadTreeNode node in LeafNodes) {
+            int[] coordinates = GetCoordinateOfLeafNode(node);
+            int x = coordinates[0];
+            int y = coordinates[1];
+
+            // loop through image map subcells and sum their values
+            int valueSum = 0;
+            for (int iy = 0; iy < subCellsPerSide; iy++) {
+                for (int ix = 0; ix < subCellsPerSide; ix++) {
+                    int mx = x + ix;
+                    int my = y + iy;
+                    valueSum += map[mx, my];
+                }
+            }
+
+            // inset sum to cell
+            InsertValue(valueSum, node);
+        }
+    }
+
     public LinkedQuadTreeNode[] GetAllParentNodes(LinkedQuadTreeNode node, LinkedQuadTreeNode[] parentNodes = null) {
 
         if (parentNodes == null) {

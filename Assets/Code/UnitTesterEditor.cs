@@ -182,5 +182,35 @@ public class UnitTesterEditor : Editor {
         return success;
     }
 
+    private bool TestInsertValuesFromMap() {
+        bool success = true;
+        string messages = "";
+
+        int size = 4;
+        int height = 2;
+
+        int[,] imageMap = new int[,] {
+            { 0, 0, 1, 1 },
+            { 0, 0, 1, 1 },
+            { 0, 1, 0, 0 },
+            { 1, 1, 0, 1 },
+        };
+
+        LinkedQuadTree linkedQuadTree = new LinkedQuadTree(Vector2.zero, size, height);
+        linkedQuadTree.InsertValuesFromMap(imageMap);
+
+        TestAssert(linkedQuadTree.Nodes[1].Value == 3, "Expected value 3!", ref success, ref messages);
+        TestAssert(linkedQuadTree.Nodes[2].Value == 2, "Expected value 2!", ref success, ref messages);
+        TestAssert(linkedQuadTree.Nodes[4].Value == 4, "Expected value 4!", ref success, ref messages);
+
+        TestAssert(linkedQuadTree.IsEmpty(linkedQuadTree.Nodes[1]) == false, "Not expected empty in node 1!", ref success, ref messages);
+        TestAssert(linkedQuadTree.IsFull(linkedQuadTree.Nodes[1]) == false, "Not expected full in node 1!", ref success, ref messages);
+
+        TestAssert(linkedQuadTree.IsEmpty(linkedQuadTree.Nodes[3]) == true, "Expected empty in node 3!", ref success, ref messages);
+        TestAssert(linkedQuadTree.IsFull(linkedQuadTree.Nodes[4]) == true, "Expected full in node 4!", ref success, ref messages);
+
+        return success;
+    }
+
 #endregion
 }
