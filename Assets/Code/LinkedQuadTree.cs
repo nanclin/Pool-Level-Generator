@@ -13,11 +13,7 @@ public class LinkedQuadTree {
 
         if (depth == 0) {
             Height = height;
-            int length = 0;
-            for (int i = 0; i < height; i++) {
-                length += (int) Mathf.Pow(4, i);
-            }
-
+            int length = GetNumberOfTreeNodes(height);
             Nodes = new LinkedQuadTreeNode[length];
         }
 
@@ -119,10 +115,7 @@ public class LinkedQuadTree {
 
         int sides = NumberOfCellsPerSide(Nodes[0]);
 
-        int indexOffset = 0;
-        for (int i = 0; i < Height - 1; i++) {
-            indexOffset += (int) Mathf.Pow(4, i);
-        }
+        int indexOffset = GetNumberOfTreeNodes(Height - 1);
         int leafIndex = node.Index - indexOffset;
 
 
@@ -130,6 +123,14 @@ public class LinkedQuadTree {
         int x = leafIndex % sides;
 
         return new int[2]{ x, y };
+    }
+
+    public int GetNumberOfTreeNodes(int height) {
+        int numberOfNodes = 0;
+        for (int i = 0; i < height; i++) {
+            numberOfNodes += (int) Mathf.Pow(4, i);
+        }
+        return numberOfNodes;
     }
 
 #region Gizmos
