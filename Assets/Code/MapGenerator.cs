@@ -183,37 +183,16 @@ public class MapGenerator : MonoBehaviour {
     }
 
     public void RenderMap() {
-
         LinkedQuadTree = new LinkedQuadTree(-Vector2.one * Size / 2, Size, MaxDepth);
 
-//        LinkedQuadTreeNode lastNode = LinkedQuadTree.Nodes[LinkedQuadTree.Nodes.Length - 5];
-        LinkedQuadTree.InsertValue(1, LinkedQuadTree.Nodes[LinkedQuadTree.Nodes.Length - 1]);
-        LinkedQuadTree.InsertValue(1, LinkedQuadTree.Nodes[LinkedQuadTree.Nodes.Length - 2]);
-        LinkedQuadTree.InsertValue(1, LinkedQuadTree.Nodes[LinkedQuadTree.Nodes.Length - 3]);
-        LinkedQuadTree.InsertValue(1, LinkedQuadTree.Nodes[LinkedQuadTree.Nodes.Length - 4]);
+        float[,] map = GenerateValueMapFromImage(InputImage);
+        ImageMapRenderer.RenderBitMap(map, Treshold);
+        MeshGenerator.GenerateMarchingSquaresMesh(map, Treshold, MaxDepth);
 
-        Debug.Log(string.Format(" ...Nodes[4] IsFull()={0}", LinkedQuadTree.IsFull(LinkedQuadTree.Nodes[4])));
-        Debug.Log(string.Format(" ...Nodes[0] IsFull()={0}", LinkedQuadTree.IsFull(LinkedQuadTree.Nodes[0])));
-        Debug.Log(string.Format(" ...Nodes[4] IsEmpty()={0}", LinkedQuadTree.IsEmpty(LinkedQuadTree.Nodes[4])));
-        Debug.Log(string.Format(" ...Nodes[0] IsEmpty()={0}", LinkedQuadTree.IsEmpty(LinkedQuadTree.Nodes[0])));
-        Debug.Log(string.Format(" ...Nodes[1] IsEmpty()={0}", LinkedQuadTree.IsEmpty(LinkedQuadTree.Nodes[1])));
+        //        float[,] map = GenerateValueMapFromPerlinNoise();
+        //        ImageMapRenderer.RenderBitMap(map, PerlinTreshold);
+        //        MeshGenerator.GenerateMarchingSquaresMesh(map, Treshold, MaxDepth);
 
-        Debug.Log(string.Format(" ...Nodes[4] NormalizedValue()={0}", LinkedQuadTree.NormalizedValue(LinkedQuadTree.Nodes[4])));
-        Debug.Log(string.Format(" ...Nodes[0] NormalizedValue()={0}", LinkedQuadTree.NormalizedValue(LinkedQuadTree.Nodes[0])));
-        Debug.Log(string.Format(" ...Nodes[20] NormalizedValue()={0}", LinkedQuadTree.NormalizedValue(LinkedQuadTree.Nodes[20])));
-
-        foreach (LinkedQuadTreeNode node in LinkedQuadTree.Nodes) Debug.Log(node);
-//        foreach (LinkedQuadTreeNode node in LinkedQuadTree.GetParentNodes(lastNode)) Debug.Log(node);
-//        foreach (LinkedQuadTreeNode node in LinkedQuadTree.GetLeafNodes()) Debug.Log(node);
-
-        float[,] map = GenerateValueMapFromPerlinNoise();
-////        float[,] map = GenerateValueMapFromImage(InputImage);
-        ImageMapRenderer.RenderBitMap(map, PerlinTreshold);
-//        MeshGenerator.GenerateMarchingSquaresMesh(map, PerlinTreshold, MaxDepth);
-
-//        MeshGenerator.GenerateMesh();
-//        return;
-//
 //        ImageMapRenderer.RenderBitMap(map);
 
 //        Outlines = FindAllOutlines(map);
@@ -296,8 +275,8 @@ public class MapGenerator : MonoBehaviour {
 
         if (LinkedQuadTree != null) {
             if (DrawLinkedQuadTree) {
-//                LinkedQuadTree.DrawGizmos();
-                LinkedQuadTree.DrawLeafNodesGizmo();
+                LinkedQuadTree.DrawQuadTreeGizmo();
+//                LinkedQuadTree.DrawLeafNodesGizmo();
             }
         }
     }
