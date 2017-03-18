@@ -115,6 +115,23 @@ public class LinkedQuadTree {
         return Nodes[parentIndex];
     }
 
+    public int[] GetCoordinateOfLeafNode(LinkedQuadTreeNode node) {
+
+        int sides = NumberOfCellsPerSide(Nodes[0]);
+
+        int indexOffset = 0;
+        for (int i = 0; i < Height - 1; i++) {
+            indexOffset += (int) Mathf.Pow(4, i);
+        }
+        int leafIndex = node.Index - indexOffset;
+
+
+        int y = Mathf.FloorToInt(leafIndex / sides);
+        int x = leafIndex % sides;
+
+        return new int[2]{ x, y };
+    }
+
 #region Gizmos
 
     public void DrawQuadTreeGizmo() {

@@ -30,6 +30,9 @@ public class UnitTesterEditor : Editor {
         success &= TestNormalizedValue();
         success &= TestGetAllParentNodes();
         success &= TestNumberOfCells();
+        success &= TestGetCoordinateOfLeafNodeHeight1();
+        success &= TestGetCoordinateOfLeafNodeHeight2();
+        success &= TestGetCoordinateOfLeafNodeHeight3();
 
         return success;
     }
@@ -124,6 +127,57 @@ public class UnitTesterEditor : Editor {
         TestAssert(linkedQuadTree.NumberOfCellsPerSide(linkedQuadTree.Nodes[0]) == 4, "Expected 4 cells at this depth!", ref success, ref messages);
         TestAssert(linkedQuadTree.NumberOfCellsPerSide(linkedQuadTree.Nodes[1]) == 2, "Expected 2 cells at this depth!", ref success, ref messages);
         TestAssert(linkedQuadTree.NumberOfCellsPerSide(lastNode) == 1, "Expected 1 cell at this depth!", ref success, ref messages);
+
+        return success;
+    }
+
+    private bool TestGetCoordinateOfLeafNodeHeight1() {
+        bool success = true;
+        string messages = "";
+
+        int size = 128;
+        int height = 1;
+
+        LinkedQuadTree linkedQuadTree = new LinkedQuadTree(Vector2.zero, size, height);
+        LinkedQuadTreeNode lastNode = linkedQuadTree.Nodes[linkedQuadTree.Nodes.Length - 1];
+
+        int[] coordinates = linkedQuadTree.GetCoordinateOfLeafNode(lastNode);
+        TestAssert(coordinates[0] == 0, "Expected 0!", ref success, ref messages);
+        TestAssert(coordinates[1] == 0, "Expected 0!", ref success, ref messages);
+
+        return success;
+    }
+
+    private bool TestGetCoordinateOfLeafNodeHeight2() {
+        bool success = true;
+        string messages = "";
+
+        int size = 128;
+        int height = 2;
+
+        LinkedQuadTree linkedQuadTree = new LinkedQuadTree(Vector2.zero, size, height);
+        LinkedQuadTreeNode lastNode = linkedQuadTree.Nodes[linkedQuadTree.Nodes.Length - 1];
+
+        int[] coordinates = linkedQuadTree.GetCoordinateOfLeafNode(lastNode);
+        TestAssert(coordinates[0] == 1, "Expected 1!", ref success, ref messages);
+        TestAssert(coordinates[1] == 1, "Expected 1!", ref success, ref messages);
+        
+        return success;
+    }
+
+    private bool TestGetCoordinateOfLeafNodeHeight3() {
+        bool success = true;
+        string messages = "";
+
+        int size = 128;
+        int height = 3;
+
+        LinkedQuadTree linkedQuadTree = new LinkedQuadTree(Vector2.zero, size, height);
+        LinkedQuadTreeNode lastNode = linkedQuadTree.Nodes[linkedQuadTree.Nodes.Length - 1];
+
+        int[] coordinates = linkedQuadTree.GetCoordinateOfLeafNode(lastNode);
+        TestAssert(coordinates[0] == 3, "Expected 3!", ref success, ref messages);
+        TestAssert(coordinates[1] == 3, "Expected 3!", ref success, ref messages);
 
         return success;
     }
